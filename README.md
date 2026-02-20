@@ -4,11 +4,7 @@
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green?style=flat-square)
 ![Forge](https://img.shields.io/badge/Forge-47.x-red?style=flat-square)
 ![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square)
-<<<<<<< HEAD
 ![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
-=======
-![License](https://img.shields.io/badge/License-GLP_3.0-blue?style=flat-square)
->>>>>>> 3828307 (Initial implementation: Core logic, Attributes scaling & Config)
 
 **EF Progressive Difficulty** is a lightweight Forge mod tailored for the **Epic Fight Mod**. It solves the problem of combat becoming too easy in the late game by dynamically scaling mob attributes based on the world's total running time.
 
@@ -56,7 +52,6 @@ Bonus = BaseValue * (1 + Multiplier * DaysPassed)
 
 ---
 
-<<<<<<< HEAD
 ## 📥 Installation
 
 1.  Install **Minecraft Forge** (1.20.1).
@@ -64,32 +59,11 @@ Bonus = BaseValue * (1 + Multiplier * DaysPassed)
 3.  Download **EF Progressive Difficulty** and drop it into your `mods` folder.
 4.  Run the game and enjoy the pain!
     
-=======
-
-## 📥 Installation
-
-1.  Install **Minecraft Forge** (1.20.1).
-    
-2.  Install **Epic Fight Mod** (Required dependency).
-    
-3.  Download **EF Progressive Difficulty** and drop it into your `mods` folder.
-    
-4.  Run the game and enjoy the pain1.  !
-    
-
->>>>>>> 3828307 (Initial implementation: Core logic, Attributes scaling & Config)
 ----------
 
 ## 🤝 Credits
 
 -   **Author:** Minhhjjj
-<<<<<<< HEAD
 -   **Dependency:** [Epic Fight Mod](https://www.curseforge.com/minecraft/mc-mods/epic-fight-mod) by Yesman.
 ---
 _Found a bug? Please report it in the Issues tab!_
-=======
-    
--   **Dependency:** [Epic Fight Mod](https://www.curseforge.com/minecraft/mc-mods/epic-fight-mod) by Yesman.
----
-_Found a bug? Please report it in the Issues tab!_
->>>>>>> 3828307 (Initial implementation: Core logic, Attributes scaling & Config)
