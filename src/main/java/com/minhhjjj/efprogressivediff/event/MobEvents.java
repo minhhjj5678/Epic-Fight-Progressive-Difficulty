@@ -17,6 +17,7 @@ import net.minecraft.world.entity.Pose;
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
 	
+	@SuppressWarnings("null")
 	@SubscribeEvent
 	public static void onSpawn(MobSpawnEvent.FinalizeSpawn event) {
 		Mob entity = event.getEntity();
