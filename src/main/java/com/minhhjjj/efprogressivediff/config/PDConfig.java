@@ -1,18 +1,10 @@
 package com.minhhjjj.efprogressivediff.config;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class PDConfig {
@@ -59,6 +51,12 @@ public class PDConfig {
     private static final ForgeConfigSpec.IntValue MAX_STRIKES_CAP = BUILDER
             .defineInRange("maxStrikesCap", 3, 0, Integer.MAX_VALUE);
 
+    private static final ForgeConfigSpec.DoubleValue MAX_DIFFICULTY_CAP = BUILDER
+            .defineInRange("maxDifficultyCap", 100, 0d, Double.MAX_VALUE);
+
+    private static final ForgeConfigSpec.DoubleValue DIFFICULTY_INCREMENT = BUILDER
+            .defineInRange("difficultyIncrement", 0.01, 0d, Double.MAX_VALUE);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean disable;
@@ -73,11 +71,13 @@ public class PDConfig {
     public static int stunArmorCap;
     public static int maxStrikesCap;
     public static int armorNegationCap;
+    public static double maxDifficultyCap;
+    public static double difficultyIncrement;
 
-    private static boolean validateItemName(final Object obj)
-    {
-        return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
-    }
+//     private static boolean validateItemName(final Object obj)
+//     {
+//         return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
+//     }
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
@@ -94,5 +94,7 @@ public class PDConfig {
         stunArmorCap = STUN_ARMOR_CAP.get();
         maxStrikesCap = MAX_STRIKES_CAP.get();
         armorNegationCap = ARMOR_NEGATION_CAP.get();
+        maxDifficultyCap = MAX_DIFFICULTY_CAP.get();
+        difficultyIncrement = DIFFICULTY_INCREMENT.get();
     }
 }
