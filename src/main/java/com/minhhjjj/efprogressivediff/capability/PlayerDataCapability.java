@@ -5,21 +5,28 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.network.NetworkDirection;
+
 import com.minhhjjj.efprogressivediff.config.PDConfig;
+import com.minhhjjj.efprogressivediff.network.DifficultySyncPacket;
+import com.minhhjjj.efprogressivediff.network.PacketHandler;
 
 public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag> {
     public static Capability<PlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<PlayerDataCapability>() {});
     private final LazyOptional<PlayerDataCapability> holder = LazyOptional.of(() -> this);
+    public static final double DEVATION_THRESHOLD = 0.5;
     
     private double difficulty = 0;
     private int tickCounter = 0;
     private int debugCounter = 0;
+    private double lastSentDifficulty = 0;
 
     public PlayerDataCapability() {
     }
@@ -43,10 +50,16 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
         this.difficulty = source.difficulty;
     }
 
-    public void tick() {
+    public void tick(ServerPlayer player) {
         tickCounter++;
         if(tickCounter >= 20) {
             addDifficulty(PDConfig.difficultyIncrement);
+            double diff = Math.abs(lastSentDifficulty - difficulty);
+            if (diff >= DEVATION_THRESHOLD) {
+                lastSentDifficulty = difficulty;
+                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty);
+                PacketHandler.channel.sendTo(msg, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+            }
             tickCounter = 0;
         }
     }
