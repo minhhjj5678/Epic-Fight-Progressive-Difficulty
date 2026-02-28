@@ -10,67 +10,102 @@ import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 public class PDConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-    private static final ForgeConfigSpec.BooleanValue DISABLE = BUILDER
-            .comment("Set to true to disable mod")
-            .define("disable", false);
+    private static final ForgeConfigSpec.BooleanValue DISABLE;
+    private static final ForgeConfigSpec.DoubleValue MAX_DIFFICULTY_CAP;
+    private static final ForgeConfigSpec.DoubleValue DIFFICULTY_INCREMENT;
 
-    private static final ForgeConfigSpec.IntValue BASE_VALUE = BUILDER
-            .comment(
+    private static final ForgeConfigSpec.DoubleValue WEIGHT_BASE_VALUE;
+    private static final ForgeConfigSpec.DoubleValue WEIGHT_MULTIPLY;
+
+    private static final ForgeConfigSpec.DoubleValue IMPACT_BASE_VALUE;
+    private static final ForgeConfigSpec.DoubleValue IMPACT_MULTIPLY;
+
+    private static final ForgeConfigSpec.DoubleValue STUN_ARMOR_BASE_VALUE;
+    private static final ForgeConfigSpec.DoubleValue STUN_ARMOR_MULTIPLY;
+
+    private static final ForgeConfigSpec.DoubleValue ARMOR_NEGATION_BASE_VALUE;
+    private static final ForgeConfigSpec.DoubleValue ARMOR_NEGATION_MULTIPLY;
+
+    private static final ForgeConfigSpec.DoubleValue MAX_STRIKES_BASE_VALUE;
+    private static final ForgeConfigSpec.DoubleValue MAX_STRIKES_MULTIPLY;
+
+    static {
+        BUILDER.comment("Common Configurations")
+                .push("General");
+                DISABLE = BUILDER
+                        .comment("Set to true to disable mod")
+                        .define("disable", false);
+
+                        // DIFFICULTY
+                MAX_DIFFICULTY_CAP = BUILDER
+                        .defineInRange("maxDifficultyCap", 100, 0d, Double.MAX_VALUE);
+
+                DIFFICULTY_INCREMENT = BUILDER
+                        .defineInRange("difficultyIncrement", 0.0083d, 0d, Double.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.comment(
                 "",
-                "Final attribute value = Original Attribute Value + Base Value * (1 + multiply * dayCount)")
-            .defineInRange("baseValue", 1, 0, Integer.MAX_VALUE);
+                "Final attribute value = Original Attribute Value + Base Value * (1 + multiply * difficulty)",
+                "Base Value is the amount added to the attribute at difficulty 0. ",
+                "Multiply is how much the added amount increases per difficulty. ")
+                .push("Attribute");
 
-    private static final ForgeConfigSpec.DoubleValue WEIGHT_MULTIPLY = BUILDER
-            .defineInRange("weightMultiply", 0.05, 0, 1);
+                BUILDER.push("Weight");
+                WEIGHT_BASE_VALUE = BUILDER
+                        .defineInRange("weightBaseValue", 50, 0.0d, Double.MAX_VALUE);
 
-    private static final ForgeConfigSpec.DoubleValue IMPACT_MULTIPLY = BUILDER
-            .defineInRange("impactMultiply", 0.05, 0, 1);
+                WEIGHT_MULTIPLY = BUILDER
+                        .defineInRange("weightMultiply", 0.07, 0, 1);
+                BUILDER.pop();
 
-    private static final ForgeConfigSpec.DoubleValue STUN_ARMOR_MULTIPLY = BUILDER
-            .defineInRange("stunArmorMultiply", 0.05, 0, 1);
+                BUILDER.push("Impact");
+                IMPACT_BASE_VALUE = BUILDER
+                        .defineInRange("impactBaseValue", 1, 0.0d, Double.MAX_VALUE);
 
-    private static final ForgeConfigSpec.DoubleValue ARMOR_NEGATION_MULTIPLY = BUILDER
-            .defineInRange("armorNegationMultiply", 0.05, 0, 1);
+                IMPACT_MULTIPLY = BUILDER
+                        .defineInRange("impactMultiply", 0.05, 0, 1);
+                BUILDER.pop();
 
-    private static final ForgeConfigSpec.DoubleValue MAX_STRIKES_MULTIPLY = BUILDER
-            .defineInRange("maxStrikesMultiply", 0.03, 0, 1);
+                BUILDER.push("Stun Armor");
+                STUN_ARMOR_BASE_VALUE = BUILDER
+                        .defineInRange("stunArmorBaseValue", 1, 0.0d, Double.MAX_VALUE);
 
-    private static final ForgeConfigSpec.IntValue WEIGHT_CAP = BUILDER
-            .comment("The maximum additional value mobs can gain")
-            .defineInRange("weightCap", 10, 0, Integer.MAX_VALUE);
+                STUN_ARMOR_MULTIPLY = BUILDER
+                        .defineInRange("stunArmorMultiply", 0.05, 0, 1);
+                BUILDER.pop();
 
-    private static final ForgeConfigSpec.IntValue IMPACT_CAP = BUILDER
-            .defineInRange("impactCap", 10, 0, Integer.MAX_VALUE);
+                BUILDER.push("Armor Negation");
+                ARMOR_NEGATION_BASE_VALUE = BUILDER
+                        .defineInRange("armorNegationBaseValue", 5, 0.0d, Double.MAX_VALUE);
 
-    private static final ForgeConfigSpec.IntValue STUN_ARMOR_CAP = BUILDER
-            .defineInRange("stunArmorCap", 40, 0, Integer.MAX_VALUE);
+                ARMOR_NEGATION_MULTIPLY = BUILDER
+                        .defineInRange("armorNegationMultiply", 0.05, 0, 1);
+                BUILDER.pop();
 
-    private static final ForgeConfigSpec.IntValue ARMOR_NEGATION_CAP = BUILDER
-            .defineInRange("armorNegationCap", 30, 0, Integer.MAX_VALUE);
+                BUILDER.push("Max Strikes");
+                MAX_STRIKES_BASE_VALUE = BUILDER
+                        .defineInRange("maxStrikesBaseValue", 1, 0.0d, Double.MAX_VALUE);
 
-    private static final ForgeConfigSpec.IntValue MAX_STRIKES_CAP = BUILDER
-            .defineInRange("maxStrikesCap", 3, 0, Integer.MAX_VALUE);
-
-    private static final ForgeConfigSpec.DoubleValue MAX_DIFFICULTY_CAP = BUILDER
-            .defineInRange("maxDifficultyCap", 100, 0d, Double.MAX_VALUE);
-
-    private static final ForgeConfigSpec.DoubleValue DIFFICULTY_INCREMENT = BUILDER
-            .defineInRange("difficultyIncrement", 0.01, 0d, Double.MAX_VALUE);
+                MAX_STRIKES_MULTIPLY = BUILDER
+                        .defineInRange("maxStrikesMultiply", 0.03, 0, 1);
+                BUILDER.pop();
+        BUILDER.pop();
+    }
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean disable;
-    public static int baseValue;
+    public static double weightBaseValue;
     public static double weightMultiply;
+    public static double impactBaseValue;
     public static double impactMultiply;
+    public static double stunArmorBaseValue;
     public static double stunArmorMultiply;
+    public static double armorNegationBaseValue;
     public static double armorNegationMultiply;
+    public static double maxStrikesBaseValue;
     public static double maxStrikesMultiply;
-    public static int weightCap;
-    public static int impactCap;
-    public static int stunArmorCap;
-    public static int maxStrikesCap;
-    public static int armorNegationCap;
     public static double maxDifficultyCap;
     public static double difficultyIncrement;
 
@@ -82,19 +117,20 @@ public class PDConfig {
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
-        disable = DISABLE.get();
-        baseValue = BASE_VALUE.get();
-        weightMultiply = WEIGHT_MULTIPLY.get();
-        impactMultiply = IMPACT_MULTIPLY.get();
-        stunArmorMultiply = STUN_ARMOR_MULTIPLY.get();
-        armorNegationMultiply = ARMOR_NEGATION_MULTIPLY.get();
-        maxStrikesMultiply = MAX_STRIKES_MULTIPLY.get();
-        weightCap = WEIGHT_CAP.get();
-        impactCap = IMPACT_CAP.get();
-        stunArmorCap = STUN_ARMOR_CAP.get();
-        maxStrikesCap = MAX_STRIKES_CAP.get();
-        armorNegationCap = ARMOR_NEGATION_CAP.get();
-        maxDifficultyCap = MAX_DIFFICULTY_CAP.get();
-        difficultyIncrement = DIFFICULTY_INCREMENT.get();
+        if (event.getConfig().getSpec() == PDConfig.SPEC) {
+                disable = DISABLE.get();
+                weightMultiply = WEIGHT_MULTIPLY.get();
+                impactMultiply = IMPACT_MULTIPLY.get();
+                stunArmorMultiply = STUN_ARMOR_MULTIPLY.get();
+                armorNegationMultiply = ARMOR_NEGATION_MULTIPLY.get();
+                maxStrikesMultiply = MAX_STRIKES_MULTIPLY.get();
+                maxDifficultyCap = MAX_DIFFICULTY_CAP.get();
+                difficultyIncrement = DIFFICULTY_INCREMENT.get();
+                weightBaseValue = WEIGHT_BASE_VALUE.get();
+                impactBaseValue = IMPACT_BASE_VALUE.get();
+                stunArmorBaseValue = STUN_ARMOR_BASE_VALUE.get();
+                armorNegationBaseValue = ARMOR_NEGATION_BASE_VALUE.get();
+                maxStrikesBaseValue = MAX_STRIKES_BASE_VALUE.get();
+        }
     }
 }
