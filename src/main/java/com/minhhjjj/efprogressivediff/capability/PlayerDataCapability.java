@@ -21,7 +21,7 @@ import com.minhhjjj.efprogressivediff.network.PacketHandler;
 public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag> {
     public static Capability<PlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<PlayerDataCapability>() {});
     private final LazyOptional<PlayerDataCapability> holder = LazyOptional.of(() -> this);
-    public static final double DEVATION_THRESHOLD = 0.5;
+    public static final double DEVATION_THRESHOLD = 0.1;
     
     private double difficulty = 0;
     private int tickCounter = 0;
