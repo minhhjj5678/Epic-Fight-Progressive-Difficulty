@@ -20,7 +20,7 @@ public class DifficultyOverlay {
             double percentage = Math.min(maxDiff > 0 ? currentDiff / maxDiff : 0, 1);
             
             int barWidth = 100;
-            int barHeight = 30;
+            int barHeight = 10;
             int posX = PDClientConfig.posX;
             int posY = PDClientConfig.posY;
 
@@ -32,7 +32,7 @@ public class DifficultyOverlay {
                 poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, 0xFFAA0000);
             }
             String text = String.format("%.2f / %.0f", currentDiff, maxDiff);
-            poseStack.drawString(mc.font, text, posX-1, screenHeight-posY-barHeight-2, 0xFFFFFF, true);
+            poseStack.drawString(mc.font, text, posX-1, screenHeight-posY-2, 0xFFFFFF, true);
         });
     };
 }
