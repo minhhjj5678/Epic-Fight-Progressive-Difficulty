@@ -5,17 +5,27 @@ import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.List;
+
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
+import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
+
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
+	public static final int RADIUS = 64;
 	
 	@SuppressWarnings("null")
 	@SubscribeEvent
@@ -23,23 +33,41 @@ public class MobEvents {
 		Mob entity = event.getEntity();
 		if(event.getLevel().isClientSide()) return;
 		if(!(entity.level() instanceof ServerLevel level)) return;
-		int dayCount = (int) (level.getGameTime() / Level.TICKS_PER_DAY);
+		
+		BlockPos mobPos = entity.blockPosition();
+		AABB spawnArea = new AABB(mobPos).inflate(RADIUS);
+		List<Player> nearbyPlayers = level.getEntitiesOfClass(Player.class, spawnArea);
+		if(nearbyPlayers.isEmpty()) return;
+		double totalDifficulty = 0;
+		double totalWeight = 0;
+		for(Player player : nearbyPlayers) {
+			double distance = Math.sqrt(player.distanceToSqr(entity.getX(), entity.getY(), entity.getZ()));
+			double weight = Mth.clamp(1 - (distance / RADIUS), 0.0, 1.0);
+			totalDifficulty += player.getCapability(PlayerDataCapability.INSTANCE).map(PlayerDataCapability::getDifficulty).orElse(0.0) * weight;
+			totalWeight += weight;
+		}
+		double averageDifficulty = Math.min(totalWeight > 0 ? totalDifficulty / totalWeight : 0, PDConfig.maxDifficultyCap);
+		
 		AttributeInstance weight = entity.getAttribute(EpicFightAttributes.WEIGHT.get());
 		AttributeInstance impact = entity.getAttribute(EpicFightAttributes.IMPACT.get());
 		AttributeInstance stunArmor = entity.getAttribute(EpicFightAttributes.STUN_ARMOR.get());
 		AttributeInstance maxStrikes = entity.getAttribute(EpicFightAttributes.MAX_STRIKES.get());
 		AttributeInstance armorNegation = entity.getAttribute(EpicFightAttributes.ARMOR_NEGATION.get());
 		double amount;
-		double BASE_VALUE = PDConfig.baseValue;
+		double WEIGHT_BASE_VALUE = PDConfig.weightBaseValue;
+		double IMPACT_BASE_VALUE = PDConfig.impactBaseValue;
+		double STUN_ARMOR_BASE_VALUE = PDConfig.stunArmorBaseValue;
+		double MAX_STRIKES_BASE_VALUE = PDConfig.maxStrikesBaseValue;
+		double ARMOR_NEGATION_BASE_VALUE = PDConfig.armorNegationBaseValue;
 
 		if(weight != null && impact != null && stunArmor != null && maxStrikes != null && armorNegation != null) {
-			amount = impact.getBaseValue() + Math.min(BASE_VALUE*(1+PDConfig.impactMultiply*dayCount), PDConfig.impactCap);
+			amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.impactMultiply*averageDifficulty);
 			impact.setBaseValue(amount);
-			amount = stunArmor.getBaseValue() + Math.min(BASE_VALUE*(1+PDConfig.stunArmorMultiply*dayCount), PDConfig.stunArmorCap);
+			amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.stunArmorMultiply*averageDifficulty);
 			stunArmor.setBaseValue(amount);
-			amount = maxStrikes.getBaseValue() + Math.min(BASE_VALUE*(1+PDConfig.maxStrikesMultiply*dayCount), PDConfig.maxStrikesCap);
+			amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.maxStrikesMultiply*averageDifficulty));
 			maxStrikes.setBaseValue(amount);
-			amount = armorNegation.getBaseValue() + Math.min(BASE_VALUE*(1+PDConfig.armorNegationMultiply*dayCount), PDConfig.armorNegationCap);
+			amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.armorNegationMultiply*averageDifficulty));
 			armorNegation.setBaseValue(amount);
 
 			if(weight.getBaseValue() == 0.0D) {
@@ -47,7 +75,7 @@ public class MobEvents {
 				double newWeight = dims.width * dims.height * LivingEntityPatch.WEIGHT_CORRECTION;
 				weight.setBaseValue(newWeight);
 			}
-			amount = weight.getBaseValue() + Math.min(BASE_VALUE*(1+PDConfig.weightMultiply*dayCount), PDConfig.weightCap);
+			amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.weightMultiply*averageDifficulty);
 			weight.setBaseValue(amount);
 		}
 	}
