@@ -5,6 +5,7 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
 import com.minhhjjj.efprogressivediff.client.DifficultyOverlay;
+import com.minhhjjj.efprogressivediff.command.DifficultyCommand;
 import com.minhhjjj.efprogressivediff.config.PDClientConfig;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 import com.minhhjjj.efprogressivediff.network.PacketHandler;
@@ -45,6 +47,11 @@ public class EFProgressiveDiff
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
         
+    }
+
+    @SubscribeEvent
+    public void onCommandRegister(RegisterCommandsEvent event) {
+        DifficultyCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent
