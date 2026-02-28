@@ -19,6 +19,7 @@ import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
 import com.minhhjjj.efprogressivediff.client.DifficultyOverlay;
 import com.minhhjjj.efprogressivediff.config.PDClientConfig;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
+import com.minhhjjj.efprogressivediff.network.PacketHandler;
 
 @Mod(EFProgressiveDiff.MODID)
 public class EFProgressiveDiff
@@ -38,7 +39,7 @@ public class EFProgressiveDiff
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-       
+        event.enqueueWork(PacketHandler::init);
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event)
