@@ -1,7 +1,6 @@
 package com.minhhjjj.efprogressivediff;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -17,7 +16,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
-import com.minhhjjj.efprogressivediff.client.DifficultyOverlay;
 import com.minhhjjj.efprogressivediff.command.DifficultyCommand;
 import com.minhhjjj.efprogressivediff.config.PDClientConfig;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
@@ -73,10 +71,6 @@ public class EFProgressiveDiff
            
         }
 
-        @SuppressWarnings("null")
-        @SubscribeEvent
-        public static void registerOverlays(RegisterGuiOverlaysEvent event) {
-            event.registerAboveAll(MODID, DifficultyOverlay.INSTANCE);
-        }
+        
     }
 }

@@ -1,17 +1,23 @@
 package com.minhhjjj.efprogressivediff.client;
 
+import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
 import com.minhhjjj.efprogressivediff.config.PDClientConfig;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class DifficultyOverlay {
     @SuppressWarnings("null")
 	public static final IGuiOverlay INSTANCE = (gui, poseStack, partialTick, screenWidth, screenHeight) -> {
         Minecraft mc = Minecraft.getInstance();
-        if(!PDClientConfig.showHud) return;
+        if(!PDClientConfig.showHud && !(KeyInputHandler.tickCounter < KeyInputHandler.TIME_APPEAR)) return;
         if(mc.player == null) return;
 
         mc.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
@@ -35,4 +41,10 @@ public class DifficultyOverlay {
             poseStack.drawString(mc.font, text, posX-1, screenHeight-posY-2, 0xFFFFFF, true);
         });
     };
+
+    @SuppressWarnings("null")
+    @SubscribeEvent
+    public static void registerOverlays(RegisterGuiOverlaysEvent event) {
+        event.registerAboveAll(EFProgressiveDiff.MODID, DifficultyOverlay.INSTANCE);
+    }
 }
