@@ -1,0 +1,14 @@
+{
+  "key.category.efprogressivediff": "Epic Fight Progressive Difficulty",
+  "key.efprogressivediff.toggle_gui": "Toggle Difficulty HUD",
+
+  "command.efprogressivediff.notfound": "[Epic Fight Progressive Difficulty] No players found.",
+  "command.efprogressivediff.add.notify": "[Epic Fight Progressive Difficulty] Adding %s to your difficulty",
+  "command.efprogressivediff.add.success": "[Epic Fight Progressive Difficulty] Added %s difficulty to %s player(s).",
+  "command.efprogressivediff.set.notify": "[Epic Fight Progressive Difficulty] Your difficulty has been set to %s.",
+  "command.efprogressivediff.set.success": "[Epic Fight Progressive Difficulty] Set difficulty to %s for %s player(s).",
+  "command.efprogressivediff.get.success": "[Epic Fight Progressive Difficulty] %s's difficulty is %s.",
+  "command.efprogressivediff.get.fail": "[Epic Fight Progressive Difficulty] Unable to retrieve difficulty for player %s.",
+  "command.efprogressivediff.around.success": "[Epic Fight Progressive Difficulty] Around difficulty is %s.",
+  "command.efprogressivediff.around.fail": "[Epic Fight Progressive Difficulty] No nearby players with difficulty data found."
+}

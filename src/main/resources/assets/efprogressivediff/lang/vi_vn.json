@@ -1,0 +1,14 @@
+{
+  "key.category.efprogressivediff": "Epic Fight Progressive Difficulty",
+  "key.efprogressivediff.toggle_gui": "Bật thanh HUD độ khó",
+
+  "command.efprogressivediff.notfound": "[Epic Fight Progressive Difficulty] Không tìm thấy người chơi nào.",
+  "command.efprogressivediff.add.notify": "[Epic Fight Progressive Difficulty] Đã thêm %s vào độ khó của bạn.",
+  "command.efprogressivediff.add.success": "[Epic Fight Progressive Difficulty] Đã thêm %s độ khó cho %s người chơi.",
+  "command.efprogressivediff.set.notify": "[Epic Fight Progressive Difficulty] Độ khó của bạn đã được đặt thành %s.",
+  "command.efprogressivediff.set.success": "[Epic Fight Progressive Difficulty] Đã đặt độ khó %s cho %s người chơi.",
+  "command.efprogressivediff.get.success": "[Epic Fight Progressive Difficulty] Độ khó của %s là %s.",
+  "command.efprogressivediff.get.fail": "[Epic Fight Progressive Difficulty] Không thể lấy độ khó của %s.",
+  "command.efprogressivediff.around.success": "[Epic Fight Progressive Difficulty] Độ khó khu vực hiện tại là %s.",
+  "command.efprogressivediff.around.fail": "[Epic Fight Progressive Difficulty] Không tìm thấy người chơi xung quanh khu vực hiện tại."
+}

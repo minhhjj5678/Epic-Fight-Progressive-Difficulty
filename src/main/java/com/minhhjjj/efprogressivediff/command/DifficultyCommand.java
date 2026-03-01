@@ -1,5 +1,7 @@
 package com.minhhjjj.efprogressivediff.command;
 
+import java.util.Collection;
+
 import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 import com.minhhjjj.efprogressivediff.event.MobEvents;
@@ -12,8 +14,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
-public class DifficultyCommand {
+public final class DifficultyCommand {
     @SuppressWarnings("null")
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
@@ -24,18 +27,24 @@ public class DifficultyCommand {
                     .executes(context -> {
                         double amount = DoubleArgumentType.getDouble(context, "amount");
                         int[] counter = {0};
-                        for (ServerPlayer player : EntityArgument.getPlayers(context, "players")) {
+                        Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
+                        for (ServerPlayer player : players) {
                             player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
                                 cap.addDifficulty(amount);
                                 PlayerEvents.syncDifficulty(player);
-                                player.sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] Adding " + amount + " to your difficulty"));
+                                player.sendSystemMessage(Component.translatable("command.efprogressivediff.add.notify", amount));
                                 counter[0]++;
                             });
                         }
                         if (counter[0] == 0) {
-                            context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] No players found to add difficulty."));
+                            context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.notfound"));
                         } else {
-                            context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] Added " + amount + " difficulty to " + counter[0] + " player(s)."));
+                            Entity sourceEntity = context.getSource().getEntity();
+                            if (counter[0] == 1 && sourceEntity == players.iterator().next()) {
+                                return 1;
+                            } else {
+                            context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.add.success", amount, counter[0]));
+                            }
                         }
                         return counter[0];
                     }))
@@ -47,18 +56,24 @@ public class DifficultyCommand {
                             .executes(context -> {
                                 double amount = DoubleArgumentType.getDouble(context, "amount");
                                 int[] counter = {0};
-                                for (ServerPlayer player : EntityArgument.getPlayers(context, "players")) {
+                                Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
+                                for (ServerPlayer player : players) {
                                     player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
                                         cap.setDifficulty(amount);
                                         PlayerEvents.syncDifficulty(player);
-                                        player.sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] Your difficulty has been set to " + amount));
+                                        player.sendSystemMessage(Component.translatable("command.efprogressivediff.set.notify", amount));
                                         counter[0]++;
                                     });
                                 }
                                 if (counter[0] == 0) {
-                                    context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] No players found to set difficulty."));
+                                    context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.notfound"));
                                 } else {
-                                    context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] Set difficulty to " + amount + " for " + counter[0] + " player(s)."));
+                                    Entity sourceEntity = context.getSource().getEntity();
+                                    if (counter[0] == 1 && sourceEntity == players.iterator().next()) {
+                                        return 1;
+                                    } else {
+                                    context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.set.success", amount, counter[0]));
+                                    }
                                 }
                                 return counter[0];
                             })
@@ -72,11 +87,11 @@ public class DifficultyCommand {
                             ServerPlayer player = EntityArgument.getPlayer(context, "player");
                             player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
                                 double difficulty = cap.getDifficulty();
-                                context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] " + player.getName().getString() + "'s difficulty is " + difficulty));
+                                context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.get.success", player.getName().getString(), difficulty));
                                 hasCap[0] = 1;
                             });
                             if (hasCap[0] == 0) {
-                                context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] Unable to retrieve difficulty for player " + player.getName().getString()));
+                                context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.get.fail", player.getName().getString()));
                             }
                             return hasCap[0];
                         })
@@ -87,10 +102,10 @@ public class DifficultyCommand {
                         ServerPlayer player = context.getSource().getPlayerOrException();
                         double difficultyAround = MobEvents.getDifficultyAround(player);
                         if (difficultyAround < 0) {
-                            context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] No nearby players with difficulty data found."));
+                            context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.around.fail"));
                             return 0;
                         }
-                        else context.getSource().sendSystemMessage(Component.literal("[Epic Fight Progressive Difficulty] Around difficulty is " + difficultyAround));
+                        else context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.around.success", difficultyAround));
                         return 1;
                     })
                 )
