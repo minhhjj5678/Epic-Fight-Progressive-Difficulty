@@ -51,7 +51,6 @@ public class CapabilityEventHandler {
         if (event.phase != TickEvent.Phase.END) return;
         event.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
             cap.tick((ServerPlayer)event.player);
-            cap.debug();
         });
     }
 
