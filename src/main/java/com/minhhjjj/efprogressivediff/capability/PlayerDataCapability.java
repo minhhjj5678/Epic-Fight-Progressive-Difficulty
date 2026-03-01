@@ -24,7 +24,6 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
     public static Capability<PlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<PlayerDataCapability>() {});
     private final LazyOptional<PlayerDataCapability> holder = LazyOptional.of(() -> this);
     public static final double DEVATION_THRESHOLD = 0.1;
-    public static final int AFK_TIME = PDConfig.afkTime;
 
     private double difficulty = 0;
     private double aroundDifficulty = 0;
@@ -81,7 +80,7 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
                 idleTime = 0;
             }
 
-            if (idleTime <= AFK_TIME) addDifficulty(PDConfig.difficultyIncrement);
+            if (idleTime <= PDConfig.afkTime) addDifficulty(PDConfig.difficultyIncrement);
             else addDifficulty(PDConfig.afkIncrement);
 
             setAroundDifficulty(player);

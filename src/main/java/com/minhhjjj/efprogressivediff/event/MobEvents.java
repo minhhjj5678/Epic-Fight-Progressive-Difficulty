@@ -5,6 +5,7 @@ import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -91,7 +93,16 @@ public class MobEvents {
 			totalDifficulty += player.getCapability(PlayerDataCapability.INSTANCE).map(PlayerDataCapability::getDifficulty).orElse(0.0) * weight;
 			totalWeight += weight;
 		}
-		double averageDifficulty = Math.min(totalWeight > 0 ? totalDifficulty / totalWeight : 0, PDConfig.maxDifficultyCap);
-		return averageDifficulty;
+		double averageDifficulty = totalWeight > 0 ? totalDifficulty / totalWeight : 0;
+		averageDifficulty += averageDifficulty * (PDConfig.groupBonus * Math.max(0, nearbyPlayers.size()-1));
+		
+		ResourceKey<Level> dimension = entity.level().dimension();
+		double dimensionBonus = 0.0d;
+		if (dimension == Level.OVERWORLD) dimensionBonus = PDConfig.overworldBonus;
+		else if (dimension == Level.NETHER) dimensionBonus = PDConfig.netherBonus;
+		else if (dimension == Level.END) dimensionBonus = PDConfig.theendBonus;
+		else dimensionBonus = PDConfig.otherBonus;
+		averageDifficulty += averageDifficulty * dimensionBonus;
+		return Math.min(averageDifficulty, PDConfig.maxDifficultyCap);
 	}
 }
