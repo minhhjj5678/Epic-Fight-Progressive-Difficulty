@@ -1,12 +1,10 @@
-
 # ⚔️ Epic Fight: Progressive Difficulty
 
-![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green?style=flat-square)
-![Forge](https://img.shields.io/badge/Forge-47.x-red?style=flat-square)
-![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=flat-square)
-![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green?style=flat-square)](#) [![Forge](https://img.shields.io/badge/Forge-47.x-red?style=flat-square)](#) [![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=flat-square)](#) [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)](#)
 
-**EF Progressive Difficulty** is a lightweight Forge mod tailored for the Epic Fight Mod. It addresses a common late-game issue: combat becomes far too easy. In the later stages of a playthrough, players can effortlessly defeat basic monsters using only simple basic attacks, completely ignoring mechanics like dodging or weapon skills. This lack of challenge quickly leads to boredom. To fix this, the mod dynamically scales the Epic Fight attributes of mobs based on the world's total running time, ensuring that combat remains just as engaging, strategic, and exciting as it was on day one.
+**EF Progressive Difficulty** is a lightweight Forge mod tailored for the Epic Fight Mod. It addresses a common late-game issue: combat becomes far too easy. In the later stages of a playthrough, players can effortlessly defeat basic monsters using only simple basic attacks, completely ignoring mechanics like dodging or weapon skills. This lack of challenge quickly leads to boredom. 
+
+To fix this, the mod introduces a **Dynamic Area Difficulty** system. Mobs dynamically scale their Epic Fight attributes based on the progression of the players around them, ensuring that combat remains just as engaging, strategic, and exciting as it was on day one.
 
 > *"Make late-game combat feel like a real challenge again."*
 
@@ -14,26 +12,32 @@
 
 ## ✨ Key Features
 
-### 📈 Time-Based Scaling
-Mobs grow stronger as time passes in your world. The difficulty scales based on **Server Game Time**, meaning the longer your server/world exists, the tougher the enemies become.
+### 📈 Dynamic Area Difficulty & Player Progression
+
+Difficulty is no longer tied to server up-time. Instead, each player has their own progression score. When a mob spawns, it checks the average difficulty of all players nearby. The higher the players' scores, the tougher the mob becomes!
 
 It buffs the following **Epic Fight Attributes**:
-- **💥 Impact:** Enemies hit harder and break your guard faster.
-- **⚖️ Weight:** Enemies become heavier and harder to knock back (prevents stun-locking bosses).
-- **🛡️ Stun Armor:** Enemies are more resistant to being stunned by your attacks.
-- **⚔️ Armor Negation:** Enemy attacks penetrate your armor more effectively.
-- **🔄 Max Strikes:** Enemies can chain more attacks together.
 
+* **💥 Impact:** Enemies hit harder and break your guard faster.
+* **⚖️ Weight:** Enemies become heavier and harder to knock back (prevents stun-locking bosses).
+* **🛡️ Stun Armor:** Enemies are more resistant to being stunned by your attacks.
+* **⚔️ Armor Negation:** Enemy attacks penetrate your armor more effectively.
+* **🔄 Max Strikes:** Enemies can chain more attacks together.
 
+### 🖥️ Difficulty HUD
+
+Keep track of your current progression with a sleek, built-in visual HUD. 
+* Press **`H`** (Default Keybind) to toggle the Difficulty Bar on or off.
 
 ### ⚙️ Fully Configurable
+
 You have total control via `config/efprogressivediff-common.toml`.
-- **Multipliers:** Adjust how fast difficulty increases (e.g., +1% per day).
-- **Caps:** Set hard limits so mobs don't become invincible.
-- **Base Value:** Adjust the starting baseline for scaling.
+* **Event Triggers:** Customize how much difficulty is gained or lost through various actions (killing mobs, waking up, dimension multipliers).
+* **Multipliers & Base Values:** Adjust the starting baseline and the scaling speed for each specific Epic Fight attribute.
 
 ### 🛡️ Stable & Optimized
-- **Lag-Free:** Logic only runs on server-side tick updates.
+
+* **Lag-Free:** Logic only runs on server-side tick updates.
 
 ---
 
@@ -41,29 +45,43 @@ You have total control via `config/efprogressivediff-common.toml`.
 
 The mod applies a bonus to mob attributes using this formula:
 
-```math
-Final Value = Original Value + Bonus
-```
+`FinalValue = OriginalValue + Bonus`
+
 Where `Bonus` is calculated as:
-```math
-Bonus = BaseValue * (1 + Multiplier * DaysPassed)
-```
-(Note: "DaysPassed" is calculated from the total Server Game Time)
+
+`Bonus = BaseValue * (1 + Multiplier * AreaDifficulty)`
+
+Area Difficulty is calculated by multiplying the average player difficulty by various modifiers configured in the settings.
+
+---
+
+## 🛠️ Commands
+
+The mod provides a set of admin commands (`Requires Permission Level 2`) to easily monitor and test the difficulty system.
+
+| Command | Description |
+| :--- | :--- |
+| `/efpd get <player>` | Displays the current difficulty value of the specified player. |
+| `/efpd set <players> <amount>` | Sets the difficulty of the targeted player(s) to an exact number. |
+| `/efpd add <players> <amount>` | Adds (or subtracts, using negative numbers) difficulty to the targeted player(s). |
+| `/efpd around` | Calculates and shows the current **Area Difficulty** based on players near you. |
 
 ---
 
 ## 📥 Installation
 
-1.  Install **Minecraft Forge** (1.20.1).
-2.  Install **Epic Fight Mod** (Required dependency).
-3.  Download **EF Progressive Difficulty** and drop it into your `mods` folder.
-4.  Run the game and enjoy the pain!
-    
-----------
+1. Install **Minecraft Forge** (1.20.1).
+2. Install **Epic Fight Mod** (Required dependency).
+3. Download **EF Progressive Difficulty** and drop it into your `mods` folder. *(Note: Must be installed on BOTH the Server and the Client).*
+4. Run the game and enjoy the pain!
+
+---
 
 ## 🤝 Credits
 
--   **Author:** Minhhjjj
--   **Dependency:** [Epic Fight Mod](https://www.curseforge.com/minecraft/mc-mods/epic-fight-mod) by Yesman.
+* **Author:** Minhhjjj
+* **Dependency:** [Epic Fight Mod](https://www.curseforge.com/minecraft/mc-mods/epic-fight-mod) by Yesman.
+
 ---
-_Found a bug? Please report it in the Issues tab!_
+
+*Found a bug? Please report it in the Issues tab!*
