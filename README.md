@@ -3,7 +3,7 @@
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green?style=flat-square)
 ![Forge](https://img.shields.io/badge/Forge-47.x-red?style=flat-square)
-![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square)
+![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=flat-square)
 ![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
 
 **EF Progressive Difficulty** is a lightweight Forge mod tailored for the Epic Fight Mod. It addresses a common late-game issue: combat becomes far too easy. In the later stages of a playthrough, players can effortlessly defeat basic monsters using only simple basic attacks, completely ignoring mechanics like dodging or weapon skills. This lack of challenge quickly leads to boredom. To fix this, the mod dynamically scales the Epic Fight attributes of mobs based on the world's total running time, ensuring that combat remains just as engaging, strategic, and exciting as it was on day one.
