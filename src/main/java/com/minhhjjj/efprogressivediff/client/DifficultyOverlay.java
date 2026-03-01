@@ -14,6 +14,12 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class DifficultyOverlay {
+    public static final int BLACK = 0xFF000000;
+    public static final int DARK_GRAY = 0xFF555555;
+    public static final int RED = 0xFFAA0000;
+    public static final int GREEN = 0xFF00AA00;
+    public static final int PURPLE = 0xFFAA00AA;
+
     @SuppressWarnings("null")
 	public static final IGuiOverlay INSTANCE = (gui, poseStack, partialTick, screenWidth, screenHeight) -> {
         Minecraft mc = Minecraft.getInstance();
@@ -21,7 +27,7 @@ public class DifficultyOverlay {
         if(mc.player == null) return;
 
         mc.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-            double currentDiff = cap.getDifficulty();
+            double currentDiff = cap.getAroundDifficulty();
             double maxDiff = PDConfig.maxDifficultyCap;
             double percentage = Math.min(maxDiff > 0 ? currentDiff / maxDiff : 0, 1);
             
@@ -32,10 +38,16 @@ public class DifficultyOverlay {
 
             int filledWidth = (int) (barWidth * percentage);
 
-            poseStack.fill(posX-1, screenHeight-posY-barHeight-1, posX+barWidth+1, screenHeight-posY+1, 0xFF000000);
-            poseStack.fill(posX, screenHeight-posY-barHeight, posX+barWidth, screenHeight-posY, 0xFF555555);
+            poseStack.fill(posX-1, screenHeight-posY-barHeight-1, posX+barWidth+1, screenHeight-posY+1, BLACK);
+            poseStack.fill(posX, screenHeight-posY-barHeight, posX+barWidth, screenHeight-posY, DARK_GRAY);
             if (filledWidth > 0) {
-                poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, 0xFFAA0000);
+                if (percentage < 0.33) {
+                    poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, GREEN);
+                } else if (percentage < 0.66) {
+                    poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, RED);
+                } else {
+                poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, PURPLE);
+                }
             }
             String text = String.format("%.2f / %.0f", currentDiff, maxDiff);
             poseStack.drawString(mc.font, text, posX-1, screenHeight-posY-2, 0xFFFFFF, true);
