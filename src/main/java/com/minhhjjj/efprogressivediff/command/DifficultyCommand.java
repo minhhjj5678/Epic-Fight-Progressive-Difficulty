@@ -2,7 +2,7 @@ package com.minhhjjj.efprogressivediff.command;
 
 import java.util.Collection;
 
-import com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment;
+import static com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment.type;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 import com.minhhjjj.efprogressivediff.event.MobEvents;
 import com.minhhjjj.efprogressivediff.event.PlayerEvents;
@@ -29,7 +29,7 @@ public final class DifficultyCommand {
                         int[] counter = {0};
                         Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
                         for (ServerPlayer player : players) {
-                            player.getData(PlayerDataAttachment.PLAYER_DIFFICULTY).addDifficulty(amount);
+                            player.getData(type()).addDifficulty(amount);
                             PlayerEvents.syncDifficulty(player);
                             player.sendSystemMessage(Component.translatable("command.efprogressivediff.add.notify", amount));
                             counter[0]++;
@@ -56,7 +56,7 @@ public final class DifficultyCommand {
                                 int[] counter = {0};
                                 Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
                                 for (ServerPlayer player : players) {
-                                    player.getData(PlayerDataAttachment.PLAYER_DIFFICULTY).setDifficulty(amount);
+                                    player.getData(type()).setDifficulty(amount);
                                     PlayerEvents.syncDifficulty(player);
                                     player.sendSystemMessage(Component.translatable("command.efprogressivediff.add.notify", amount));
                                     counter[0]++;
@@ -80,7 +80,7 @@ public final class DifficultyCommand {
                     .then(Commands.argument("player", EntityArgument.player())
                         .executes(context -> {
                             ServerPlayer player = EntityArgument.getPlayer(context, "player");
-                            double difficulty = player.getData(PlayerDataAttachment.PLAYER_DIFFICULTY).getDifficulty();
+                            double difficulty = player.getData(type()).getDifficulty();
                             context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.get.success", player.getName().getString(), difficulty));
                             return 1;
                         })

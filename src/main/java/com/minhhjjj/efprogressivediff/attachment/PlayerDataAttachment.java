@@ -14,6 +14,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import javax.annotation.Nonnull;
+
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 import com.minhhjjj.efprogressivediff.event.MobEvents;
@@ -37,7 +39,6 @@ public class PlayerDataAttachment implements INBTSerializable<CompoundTag> {
         ATTACHMENT_TYPES.register(NAME, () -> AttachmentType.builder(() -> new PlayerDataAttachment())
             .serialize(PlayerDataAttachment.CODEC)
             .copyOnDeath()
-            .sync(streamCodec)
         .build());
 
     public static final double DEVATION_THRESHOLD = 0.1;
@@ -138,5 +139,9 @@ public class PlayerDataAttachment implements INBTSerializable<CompoundTag> {
             difficulty = nbt.getDouble("difficulty");
             aroundDifficulty = nbt.getDouble("aroundDifficulty");
         }
+    }
+
+    public static @Nonnull AttachmentType<PlayerDataAttachment> type() {
+        return PlayerDataAttachment.PLAYER_DIFFICULTY.get();
     }
 }

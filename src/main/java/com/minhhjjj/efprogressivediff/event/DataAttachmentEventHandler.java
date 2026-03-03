@@ -2,6 +2,7 @@ package com.minhhjjj.efprogressivediff.event;
 
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 import com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment;
+import static com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment.type;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,7 +15,7 @@ public class DataAttachmentEventHandler {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if (PlayerDataAttachment.PLAYER_DIFFICULTY != null) player.getData(PlayerDataAttachment.PLAYER_DIFFICULTY).tick(player);
+        if (PlayerDataAttachment.PLAYER_DIFFICULTY != null) player.getData(type()).tick(player);
     }
 
     // @SubscribeEvent
