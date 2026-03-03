@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 import com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment;
+import static com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment.type;
 
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -30,7 +31,6 @@ import net.minecraft.world.entity.Pose;
 @EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
 	public static final int RADIUS = 64;
-	public static final AttachmentType<PlayerDataAttachment> KEY = PlayerDataAttachment.PLAYER_DIFFICULTY.get();
 	
 	@SuppressWarnings("null")
 	@net.neoforged.bus.api.SubscribeEvent
@@ -91,7 +91,7 @@ public class MobEvents {
 		for(ServerPlayer player : nearbyPlayers) {
 			double distance = Math.sqrt(player.distanceToSqr(entity.getX(), entity.getY(), entity.getZ()));
 			double weight = Mth.clamp(1 - (distance / radius), 0.0, 1.0);
-			double difficulty = player.getData(KEY).getDifficulty();
+			double difficulty = player.getData(type()).getDifficulty();
 			totalDifficulty += difficulty * weight;
 			totalWeight += weight;
 		}
