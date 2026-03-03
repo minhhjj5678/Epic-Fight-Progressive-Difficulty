@@ -1,0 +1,14 @@
+{
+  "key.category.efprogressivediff": "史诗战斗 - 渐进式难度",
+  "key.efprogressivediff.toggle_gui": "显示/隐藏难度 HUD",
+
+  "command.efprogressivediff.notfound": "[史诗战斗-渐进式难度] 未找到玩家。",
+  "command.efprogressivediff.add.notify": "[史诗战斗-渐进式难度] 已将你的难度增加 %s",
+  "command.efprogressivediff.add.success": "[史诗战斗-渐进式难度] 已增加 %s 点难度至 %s 名玩家。",
+  "command.efprogressivediff.set.notify": "[史诗战斗-渐进式难度] 你的难度已设为 %s。",
+  "command.efprogressivediff.set.success": "[史诗战斗-渐进式难度] 已将难度 %s 设置给 %s 名玩家。",
+  "command.efprogressivediff.get.success": "[史诗战斗-渐进式难度] %s 的难度为 %s。",
+  "command.efprogressivediff.get.fail": "[史诗战斗-渐进式难度] 无法获取玩家 %s 的难度数据。",
+  "command.efprogressivediff.around.success": "[史诗战斗-渐进式难度] 周围的难度为 %s。",
+  "command.efprogressivediff.around.fail": "[史诗战斗-渐进式难度] 附近未找到带有难度数据的玩家。"
+}
