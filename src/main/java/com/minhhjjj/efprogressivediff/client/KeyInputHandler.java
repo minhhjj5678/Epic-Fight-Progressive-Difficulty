@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent;
@@ -22,6 +23,7 @@ public class KeyInputHandler {
         if (event.getAction() != GLFW.GLFW_PRESS) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
+        if (mc.screen instanceof ChatScreen) return;
         tickCounter = 0;
     }
 

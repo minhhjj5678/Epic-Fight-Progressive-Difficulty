@@ -135,7 +135,7 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    implementation fg.deobf("curse.maven:epic-fight-mod-405076:7584041")
+    implementation fg.deobf("curse.maven:epic-fight-mod-405076:7899801")
     implementation fg.deobf("curse.maven:scaling-health-248027:5065403")
     
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings

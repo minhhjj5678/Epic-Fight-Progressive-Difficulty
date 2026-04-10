@@ -2,6 +2,7 @@ package com.minhhjjj.efprogressivediff.event;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.Pose;
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
 	public static final int RADIUS = 64;
+	private static final String WEIGHT_INIT_TAG = EFProgressiveDiff.MODID + ":weight_initialized";
 	
 	@SuppressWarnings("null")
 	@SubscribeEvent
@@ -40,12 +42,43 @@ public class MobEvents {
 		
 		double averageDifficulty = getDifficultyAround(entity);
 		if (averageDifficulty < 0) return;
+		applyDifficultyScaling(entity, averageDifficulty);
+	}
 
+	public static double getDifficultyAround(Entity entity) {
+		return getDifficultyAround(entity, RADIUS);
+	}
+
+	@SuppressWarnings("null")
+	@SubscribeEvent
+	public static void onMobFirstTick(LivingTickEvent event) {
+		if (!(event.getEntity() instanceof Mob mob)) return;
+		if (mob.level().isClientSide()) return;
+		if (!(mob.level() instanceof ServerLevel)) return;
+		if (mob.getPersistentData().getBoolean(WEIGHT_INIT_TAG)) return;
+
+		AttributeInstance weight = mob.getAttribute(EpicFightAttributes.WEIGHT.get());
+		if (weight == null) {
+			mob.getPersistentData().putBoolean(WEIGHT_INIT_TAG, true);
+			return;
+		}
+
+		if (weight.getBaseValue() == 0.0D) {
+			double averageDifficulty = Math.max(0.0D, getDifficultyAround(mob));
+			applyDifficultyScaling(mob, averageDifficulty);
+		}
+
+		mob.getPersistentData().putBoolean(WEIGHT_INIT_TAG, true);
+	}
+
+	private static void applyDifficultyScaling(Mob entity, double averageDifficulty) {
 		AttributeInstance weight = entity.getAttribute(EpicFightAttributes.WEIGHT.get());
 		AttributeInstance impact = entity.getAttribute(EpicFightAttributes.IMPACT.get());
 		AttributeInstance stunArmor = entity.getAttribute(EpicFightAttributes.STUN_ARMOR.get());
 		AttributeInstance maxStrikes = entity.getAttribute(EpicFightAttributes.MAX_STRIKES.get());
 		AttributeInstance armorNegation = entity.getAttribute(EpicFightAttributes.ARMOR_NEGATION.get());
+		if(weight == null || impact == null || stunArmor == null || maxStrikes == null || armorNegation == null) return;
+
 		double amount;
 		double WEIGHT_BASE_VALUE = PDConfig.weightBaseValue;
 		double IMPACT_BASE_VALUE = PDConfig.impactBaseValue;
@@ -53,28 +86,22 @@ public class MobEvents {
 		double MAX_STRIKES_BASE_VALUE = PDConfig.maxStrikesBaseValue;
 		double ARMOR_NEGATION_BASE_VALUE = PDConfig.armorNegationBaseValue;
 
-		if(weight != null && impact != null && stunArmor != null && maxStrikes != null && armorNegation != null) {
-			amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.impactMultiply*averageDifficulty);
-			impact.setBaseValue(amount);
-			amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.stunArmorMultiply*averageDifficulty);
-			stunArmor.setBaseValue(amount);
-			amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.maxStrikesMultiply*averageDifficulty));
-			maxStrikes.setBaseValue(amount);
-			amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.armorNegationMultiply*averageDifficulty));
-			armorNegation.setBaseValue(amount);
+		amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.impactMultiply*averageDifficulty);
+		impact.setBaseValue(amount);
+		amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.stunArmorMultiply*averageDifficulty);
+		stunArmor.setBaseValue(amount);
+		amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.maxStrikesMultiply*averageDifficulty));
+		maxStrikes.setBaseValue(amount);
+		amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.armorNegationMultiply*averageDifficulty));
+		armorNegation.setBaseValue(amount);
 
-			if(weight.getBaseValue() == 0.0D) {
-				EntityDimensions dims = entity.getDimensions(Pose.STANDING);
-				double newWeight = dims.width * dims.height * LivingEntityPatch.WEIGHT_CORRECTION;
-				weight.setBaseValue(newWeight);
-			}
-			amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.weightMultiply*averageDifficulty);
-			weight.setBaseValue(amount);
+		if(weight.getBaseValue() == 0.0D) {
+			EntityDimensions dims = entity.getDimensions(Pose.STANDING);
+			double newWeight = dims.width * dims.height * LivingEntityPatch.WEIGHT_CORRECTION;
+			weight.setBaseValue(newWeight);
 		}
-	}
-
-	public static double getDifficultyAround(Entity entity) {
-		return getDifficultyAround(entity, RADIUS);
+		amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.weightMultiply*averageDifficulty);
+		weight.setBaseValue(amount);
 	}
 
 	@SuppressWarnings("null")

@@ -6,6 +6,8 @@ import com.minhhjjj.efprogressivediff.config.PDClientConfig;
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
@@ -20,9 +22,13 @@ public class DifficultyOverlay {
     public static final int GREEN = 0xFF00AA00;
     public static final int PURPLE = 0xFFAA00AA;
 
+    private static final ResourceLocation SKULL_NORMAL = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "textures/gui/skull_normal.png");
+    private static final ResourceLocation SKULL_HARD = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "textures/gui/skull_hard.png");
+
     @SuppressWarnings("null")
 	public static final IGuiOverlay INSTANCE = (gui, poseStack, partialTick, screenWidth, screenHeight) -> {
         Minecraft mc = Minecraft.getInstance();
+    if (mc.screen instanceof ChatScreen) return;
         if(!PDClientConfig.showHud && !(KeyInputHandler.tickCounter < KeyInputHandler.TIME_APPEAR)) return;
         if(mc.player == null) return;
 
@@ -40,17 +46,20 @@ public class DifficultyOverlay {
 
             poseStack.fill(posX-1, screenHeight-posY-barHeight-1, posX+barWidth+1, screenHeight-posY+1, BLACK);
             poseStack.fill(posX, screenHeight-posY-barHeight, posX+barWidth, screenHeight-posY, DARK_GRAY);
+
+            ResourceLocation skullTexture = percentage < 0.33 ? SKULL_NORMAL : SKULL_HARD;
             if (filledWidth > 0) {
                 if (percentage < 0.33) {
                     poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, GREEN);
                 } else if (percentage < 0.66) {
                     poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, RED);
                 } else {
-                poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, PURPLE);
+                    poseStack.fill(posX, screenHeight-posY-barHeight, posX+filledWidth, screenHeight-posY, PURPLE);
                 }
             }
+            poseStack.blit(skullTexture, posX+filledWidth-8, screenHeight-posY-barHeight-4, 0.0F, 0.0F, 16, 16, 16, 16);
             String text = String.format("%.2f / %.0f", currentDiff, maxDiff);
-            poseStack.drawString(mc.font, text, posX-1, screenHeight-posY-2, 0xFFFFFF, true);
+            poseStack.drawString(mc.font, text, posX-1, screenHeight-posY+2, 0xFFFFFF, true);
         });
     };
 
