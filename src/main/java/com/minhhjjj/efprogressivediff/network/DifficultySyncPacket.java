@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 @SuppressWarnings("null")
 public record DifficultySyncPacket(double difficulty, double aroundDifficulty) implements CustomPacketPayload {
-    public static final Type<DifficultySyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "difficultySync"));
+    public static final Type<DifficultySyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "difficulty_sync"));
     public static final StreamCodec<ByteBuf, DifficultySyncPacket> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.DOUBLE, DifficultySyncPacket::difficulty, ByteBufCodecs.DOUBLE, DifficultySyncPacket::aroundDifficulty, DifficultySyncPacket::new);
 
     @Override

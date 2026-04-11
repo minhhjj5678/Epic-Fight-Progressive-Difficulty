@@ -27,6 +27,9 @@ public class DifficultyOverlay implements Layer {
     public static final int GREEN = 0xFF00AA00;
     public static final int PURPLE = 0xFFAA00AA;
 
+    private static final ResourceLocation SKULL_NORMAL = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "textures/gui/skull_normal.png");
+    private static final ResourceLocation SKULL_HARD = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "textures/gui/skull_hard.png");
+
     public static double lastDiff = -1;
     public static String text;
 
@@ -47,6 +50,7 @@ public class DifficultyOverlay implements Layer {
         int posY = PDClientConfig.posY;
 
         int HEIGHT = guiGraphics.guiHeight();
+        ResourceLocation skull = percentage < 0.3333 ? SKULL_NORMAL : SKULL_HARD;
         guiGraphics.fill(posX-1, HEIGHT-posY-barHeight-1, posX+barWidth+1, HEIGHT-posY+1, BLACK);
         guiGraphics.fill(posX, HEIGHT-posY-barHeight, posX+barWidth, HEIGHT-posY, DARK_GRAY);
         if (percentage > 0.0) {
@@ -57,9 +61,11 @@ public class DifficultyOverlay implements Layer {
             text = String.format("%.2f / %.0f", currentDiff, maxDiff);
             lastDiff = currentDiff;
         }
+
+        guiGraphics.blit(skull, (int)(posX+((int)barWidth*percentage)) - 8, HEIGHT-posY-barHeight-4, 0.0f, 0.0f, 16, 16, 16, 16);
         var font = mc.font;
         if(font == null) return;
-        guiGraphics.drawString(font, text, posX-1, HEIGHT - posY - 2, WHITE);
+        guiGraphics.drawString(font, text, posX-1, HEIGHT - posY + 2, WHITE);
     }
 
     @SuppressWarnings("null")
