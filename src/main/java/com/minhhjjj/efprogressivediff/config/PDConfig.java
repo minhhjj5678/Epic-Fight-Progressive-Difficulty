@@ -1,5 +1,7 @@
 package com.minhhjjj.efprogressivediff.config;
 
+import com.minhhjjj.efprogressivediff.data.DifficultyLoader;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +22,7 @@ public class PDConfig {
     private static final ForgeConfigSpec.DoubleValue HOSTILE_INCREMENT;
     private static final ForgeConfigSpec.DoubleValue NEUTRAL_INCREMENT;
     private static final ForgeConfigSpec.DoubleValue GROUP_BONUS;
+    private static final ForgeConfigSpec.IntValue GROUP_RADIUS;
     private static final ForgeConfigSpec.DoubleValue OVERWORLD_BONUS;
     private static final ForgeConfigSpec.DoubleValue NETHER_BONUS;
     private static final ForgeConfigSpec.DoubleValue THEEND_BONUS;
@@ -83,6 +86,10 @@ public class PDConfig {
                 GROUP_BONUS = BUILDER
                         .comment("Additional difficulty multiplier based on the number of nearby players. For example, a value of 0.1 means each additional player increases the average difficulty by 10%.")
                         .defineInRange("groupBonus", 0.05, 0.0d, Double.MAX_VALUE);
+
+                GROUP_RADIUS = BUILDER
+                        .comment("The radius around the newly spawned mob (in blocks) to check for nearby players for the group bonus.")
+                        .defineInRange("groupRadius", 64, 0, Integer.MAX_VALUE);
 
                 OVERWORLD_BONUS = BUILDER
                         .comment("Additional difficulty multiplier for being in the Overworld. For example, a value of 0.1 means the difficulty is increased by 10% in the Overworld.")
@@ -168,6 +175,7 @@ public class PDConfig {
     public static double hostileIncrement;
     public static double neutralIncrement;
     public static double groupBonus;
+    public static int groupRadius;
     public static double overworldBonus;
     public static double netherBonus;
     public static double theendBonus;
@@ -202,6 +210,7 @@ public class PDConfig {
                 hostileIncrement = HOSTILE_INCREMENT.get();
                 neutralIncrement = NEUTRAL_INCREMENT.get();
                 groupBonus = GROUP_BONUS.get();
+                groupRadius = GROUP_RADIUS.get();
                 overworldBonus = OVERWORLD_BONUS.get();
                 netherBonus = NETHER_BONUS.get();
                 theendBonus = THEEND_BONUS.get();
@@ -219,4 +228,45 @@ public class PDConfig {
                 maxStrikesBaseValue = MAX_STRIKES_BASE_VALUE.get();
         }
     }
+
+    private static final ResourceLocation RL_DIFF = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "difficulty");
+    private static final ResourceLocation RL_MOBS = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "mobs");
+    static boolean datapackLoaded() {
+        return DifficultyLoader.DIFFICULTY_MODIFIER.containsKey(RL_DIFF)
+                && DifficultyLoader.DIFFICULTY_MODIFIER.containsKey(RL_MOBS)
+                && !DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).disabled;
+    }
+
+    public static double getMaxDiff() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).maxDifficulty : maxDifficultyCap;
+    }
+
+    public static double getDifficultyIncrement() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).difficultyIncrement : difficultyIncrement;
+    }
+
+    public static int getAfkTime() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).afkTime : afkTime;
+    }
+
+    public static double getAfkIncrement() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).afkIncrement : afkIncrement;
+    }
+
+    public static double getWakeupIncrement() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).wakeupIncrement : wakeUpIncrement;
+    }
+
+    public static double getRespawnIncrement() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).respawnIncrement : respawnIncrement;
+    }
+
+    public static double getGroupBonus() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).groupBonus : groupBonus;
+    }
+
+    public static int getGroupRadius() {
+        return datapackLoaded() ? DifficultyLoader.DIFFICULTY_MODIFIER.get(RL_DIFF).groupRadius : groupRadius;
+    }
+
 }

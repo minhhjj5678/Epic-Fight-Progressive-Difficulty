@@ -1,0 +1,11 @@
+{
+  "disabled": false,
+  "maxDifficulty": 300,
+  "difficultyIncrement": 1.0,
+  "afkIncrement": 1.2,
+  "afkTime": 300,
+  "wakeupIncrement": 5.0,
+  "respawnIncrement": -10.0,
+  "groupBonus": 2.5,
+  "groupRadius": 64
+}

@@ -27,6 +27,8 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
 
     private double difficulty = 0;
     private double aroundDifficulty = 0;
+    private double maxDifficulty = 0;
+    private double lastMaxDiff = 0;
     private int tickCounter = 0;
     private int debugCounter = 0;
     private double lastSentDifficulty = 0;
@@ -56,7 +58,7 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
     public void setDifficulty(double difficulty) {
         if(Double.compare(this.difficulty, difficulty) != 0) {
             this.difficulty = difficulty;
-            this.difficulty = Mth.clamp(this.difficulty, 0d, PDConfig.maxDifficultyCap);
+            this.difficulty = Mth.clamp(this.difficulty, 0d, this.maxDifficulty);
         }
     }
 
@@ -80,14 +82,14 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
                 idleTime = 0;
             }
 
-            if (idleTime <= PDConfig.afkTime) addDifficulty(PDConfig.difficultyIncrement);
-            else addDifficulty(PDConfig.afkIncrement);
+            if (idleTime <= PDConfig.getAfkTime()) addDifficulty(PDConfig.getDifficultyIncrement());
+            else addDifficulty(PDConfig.getAfkIncrement());
 
             setAroundDifficulty(player);
             double diff = Math.abs(lastSentDifficulty - aroundDifficulty);
-            if (diff >= DEVATION_THRESHOLD) {
+            if (diff >= DEVATION_THRESHOLD || maxDifficulty < 1 || maxDifficulty != lastMaxDiff) {
                 lastSentDifficulty = aroundDifficulty;
-                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty);
+                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty, maxDifficulty < 1 ? PDConfig.getMaxDiff() : this.maxDifficulty);
                 PacketHandler.channel.sendTo(msg, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
             tickCounter = 0;
@@ -100,6 +102,14 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
             System.out.println("Current Difficulty: " + difficulty);
             debugCounter = 0;
         }
+    }
+
+    public void setMaxDifficulty(double maxDifficulty) {
+        this.maxDifficulty = maxDifficulty;
+    }
+
+    public double getMaxDifficulty() {
+        return this.maxDifficulty;
     }
 
     @Override

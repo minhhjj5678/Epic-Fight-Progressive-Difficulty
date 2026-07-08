@@ -52,7 +52,7 @@ public final class DifficultyCommand {
                 )
                 .then(Commands.literal("set")
                     .then(Commands.argument("players", EntityArgument.players())
-                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D, PDConfig.maxDifficultyCap))
+                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D, PDConfig.getMaxDiff()))
                             .executes(context -> {
                                 double amount = DoubleArgumentType.getDouble(context, "amount");
                                 int[] counter = {0};

@@ -20,6 +20,7 @@ public class ClientHandler {
         mc.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
             cap.setDifficulty(msg.difficulty);
             cap.setAroundDifficulty(msg.aroundDifficulty);
+            cap.setMaxDifficulty(msg.maxDiff);
         });
         context.setPacketHandled(true);
     }

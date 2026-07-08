@@ -30,7 +30,6 @@ import net.minecraft.world.entity.Pose;
 
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
-	public static final int RADIUS = 64;
 	private static final String WEIGHT_INIT_TAG = EFProgressiveDiff.MODID + ":weight_initialized";
 	
 	@SuppressWarnings("null")
@@ -46,7 +45,7 @@ public class MobEvents {
 	}
 
 	public static double getDifficultyAround(Entity entity) {
-		return getDifficultyAround(entity, RADIUS);
+		return getDifficultyAround(entity, PDConfig.getGroupRadius());
 	}
 
 	@SuppressWarnings("null")
@@ -121,7 +120,7 @@ public class MobEvents {
 			totalWeight += weight;
 		}
 		double averageDifficulty = totalWeight > 0 ? totalDifficulty / totalWeight : 0;
-		averageDifficulty += averageDifficulty * (PDConfig.groupBonus * Math.max(0, nearbyPlayers.size()-1));
+		averageDifficulty += averageDifficulty * (PDConfig.getGroupBonus() * Math.max(0, nearbyPlayers.size()-1));
 		
 		ResourceKey<Level> dimension = entity.level().dimension();
 		double dimensionBonus = 0.0d;
@@ -130,6 +129,6 @@ public class MobEvents {
 		else if (dimension == Level.END) dimensionBonus = PDConfig.theendBonus;
 		else dimensionBonus = PDConfig.otherBonus;
 		averageDifficulty += averageDifficulty * dimensionBonus;
-		return Math.min(averageDifficulty, PDConfig.maxDifficultyCap);
+		return Math.min(averageDifficulty, PDConfig.getMaxDiff());
 	}
 }

@@ -34,7 +34,7 @@ public class DifficultyOverlay {
 
         mc.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
             double currentDiff = cap.getAroundDifficulty();
-            double maxDiff = PDConfig.maxDifficultyCap;
+            double maxDiff = cap.getMaxDifficulty();
             double percentage = Math.min(maxDiff > 0 ? currentDiff / maxDiff : 0, 1);
             
             int barWidth = 100;
