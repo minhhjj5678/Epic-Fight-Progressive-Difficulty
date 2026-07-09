@@ -1,4 +1,4 @@
-# ⚔️ Epic Fight: Progressive Difficulty
+# Epic Fight: Progressive Difficulty
 
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green?style=flat-square)](#) [![Forge](https://img.shields.io/badge/Forge-47.x-red?style=flat-square)](#) [![Version](https://img.shields.io/badge/Version-1.1.0-orange?style=flat-square)](#) [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)](#)
 
@@ -10,38 +10,38 @@ To fix this, the mod introduces a **Dynamic Area Difficulty** system. Mobs dynam
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 📈 Dynamic Area Difficulty & Player Progression
+### Dynamic Area Difficulty & Player Progression
 
 Difficulty is no longer tied to server up-time. Instead, each player has their own progression score. When a mob spawns, it checks the average difficulty of all players nearby. The higher the players' scores, the tougher the mob becomes!
 
 It buffs the following **Epic Fight Attributes**:
 
-* **💥 Impact:** Enemies hit harder and break your guard faster.
-* **⚖️ Weight:** Enemies become heavier and harder to knock back (prevents stun-locking bosses).
-* **🛡️ Stun Armor:** Enemies are more resistant to being stunned by your attacks.
-* **⚔️ Armor Negation:** Enemy attacks penetrate your armor more effectively.
-* **🔄 Max Strikes:** Enemies can chain more attacks together.
+* **Impact:** Enemies hit harder and break your guard faster.
+* **Weight:** Enemies become heavier and harder to knock back (prevents stun-locking bosses).
+* **Stun Armor:** Enemies are more resistant to being stunned by your attacks.
+* **Armor Negation:** Enemy attacks penetrate your armor more effectively.
+* **Max Strikes:** Enemies can chain more attacks together.
 
-### 🖥️ Difficulty HUD
+### Difficulty HUD
 
 Keep track of your current progression with a sleek, built-in visual HUD. 
 * Press **`H`** (Default Keybind) to toggle the Difficulty Bar on or off.
 
-### ⚙️ Fully Configurable
+### Fully Configurable
 
 You have total control via `config/efprogressivediff-common.toml`.
 * **Event Triggers:** Customize how much difficulty is gained or lost through various actions (killing mobs, waking up, dimension multipliers).
 * **Multipliers & Base Values:** Adjust the starting baseline and the scaling speed for each specific Epic Fight attribute.
 
-### 🛡️ Stable & Optimized
+### Stable & Optimized
 
 * **Lag-Free:** Logic only runs on server-side tick updates.
 
 ---
 
-## 🧮 How it Works
+## How it Works
 
 The mod applies a bonus to mob attributes using this formula:
 
@@ -55,7 +55,7 @@ Area Difficulty is calculated by multiplying the average player difficulty by va
 
 ---
 
-## 🛠️ Commands
+## Commands
 
 The mod provides a set of admin commands (`Requires Permission Level 2`) to easily monitor and test the difficulty system.
 
@@ -68,7 +68,7 @@ The mod provides a set of admin commands (`Requires Permission Level 2`) to easi
 
 ---
 
-## 📥 Installation
+## Installation
 
 1. Install **Minecraft Forge** (1.20.1).
 2. Install **Epic Fight Mod** (Required dependency).
@@ -77,7 +77,7 @@ The mod provides a set of admin commands (`Requires Permission Level 2`) to easi
 
 ---
 
-## 🤝 Credits
+## Credits
 
 * **Author:** Minhhjjj
 * **Dependency:** [Epic Fight Mod](https://www.curseforge.com/minecraft/mc-mods/epic-fight-mod) by Yesman.
