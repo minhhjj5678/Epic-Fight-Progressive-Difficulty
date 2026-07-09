@@ -29,9 +29,7 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-            cap.addDifficulty(PDConfig.getRespawnIncrement());
-        });
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> cap.addDifficulty(PDConfig.getRespawnIncrement()));
         syncDifficulty(event.getEntity());
     }
 
@@ -43,9 +41,7 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-            cap.addDifficulty(PDConfig.getWakeupIncrement());
-        });
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> cap.addDifficulty(PDConfig.getWakeupIncrement()));
     }
 
     @SubscribeEvent
@@ -63,9 +59,7 @@ public class PlayerEvents {
 
     public static void syncDifficulty(Entity entity) {
         if(entity instanceof ServerPlayer serverPlayer) {
-            serverPlayer.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-                PacketHandler.channel.sendTo(new DifficultySyncPacket(cap.getDifficulty(), cap.getAroundDifficulty(), PDConfig.getMaxDiff()), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-            });
+            serverPlayer.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> PacketHandler.channel.sendTo(new DifficultySyncPacket(cap.getDifficulty(), cap.getAroundDifficulty(), PDConfig.getMaxDiff()), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT));
         }
     }
 }
