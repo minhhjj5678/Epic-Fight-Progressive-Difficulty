@@ -16,6 +16,7 @@ import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class PlayerEvents {
@@ -28,9 +29,7 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-            cap.addDifficulty(PDConfig.respawnIncrement);
-        });
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> cap.addDifficulty(PDConfig.getRespawnIncrement()));
         syncDifficulty(event.getEntity());
     }
 
@@ -42,9 +41,7 @@ public class PlayerEvents {
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-            cap.addDifficulty(PDConfig.wakeUpIncrement);
-        });
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> cap.addDifficulty(PDConfig.getWakeupIncrement()));
     }
 
     @SubscribeEvent
@@ -53,17 +50,16 @@ public class PlayerEvents {
         Entity source = event.getSource().getEntity();
         if (source instanceof ServerPlayer player) {
             player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-                if (victim instanceof Enemy) cap.addDifficulty(PDConfig.hostileIncrement);
-                else if (victim instanceof NeutralMob) cap.addDifficulty(PDConfig.neutralIncrement);
+                if (victim instanceof Enemy) cap.addDifficulty(PDConfig.getHostileIncrement());
+                else if (victim instanceof NeutralMob) cap.addDifficulty(PDConfig.getNeutralIncrement());
+                cap.addDifficulty(PDConfig.getMobIncrement(ForgeRegistries.ENTITY_TYPES.getKey(victim.getType())));
             });
         }
     }
 
     public static void syncDifficulty(Entity entity) {
         if(entity instanceof ServerPlayer serverPlayer) {
-            serverPlayer.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-                PacketHandler.channel.sendTo(new DifficultySyncPacket(cap.getDifficulty(), cap.getAroundDifficulty()), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-            });
+            serverPlayer.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> PacketHandler.channel.sendTo(new DifficultySyncPacket(cap.getDifficulty(), cap.getAroundDifficulty(), PDConfig.getMaxDiff()), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT));
         }
     }
 }

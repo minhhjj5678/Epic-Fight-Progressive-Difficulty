@@ -1,0 +1,40 @@
+{
+  "_comment_disabled": "Set to false to enable this datapack and override the default mod config.",
+  "disabled": false,
+
+  "_comment_expBonus": "The experience multiplier per difficulty point. Formula for dropped exp: base_exp * (1 + difficulty * exp_bonus). [Min: 0]",
+  "expBonus": 0.005,
+
+  "_comment_groupBonus": "Additional difficulty multiplier based on the number of nearby players. For example, a value of 0.1 means each additional player increases the average difficulty by 10%. [Min: 0]",
+  "groupBonus": 0.05,
+
+  "_comment_groupRadius": "The radius around the newly spawned mob (in blocks) to check for nearby players for the group bonus. [Min: 0]",
+  "groupRadius": 128,
+
+  "_comment_dimensionMultipliers": "Additional difficulty multiplier for specific dimensions. Replaces default configs like overworldBonus, netherBonus, and theendBonus.",
+  "dimensionMultipliers": [
+    {
+      "dimensionScale": 0.5,
+      "dimensions": [
+        "minecraft:the_nether"
+      ]
+    },
+    {
+      "dimensionScale": 1.25,
+      "dimensions": [
+        "minecraft:the_end"
+      ]
+    }
+  ],
+
+  "_comment_biomeMultipliers": "Additional difficulty multiplier for specific biomes.",
+  "biomeMultipliers": [
+    {
+      "biomeScale": -0.1,
+      "biomes": [
+        "minecraft:plains",
+        "minecraft:mushroom_fields"
+      ]
+    }
+  ]
+}

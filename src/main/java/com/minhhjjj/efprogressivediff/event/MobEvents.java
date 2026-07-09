@@ -1,14 +1,16 @@
 package com.minhhjjj.efprogressivediff.event;
 
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 import com.minhhjjj.efprogressivediff.capability.PlayerDataCapability;
@@ -24,13 +26,8 @@ import net.minecraft.util.Mth;
 
 import com.minhhjjj.efprogressivediff.config.PDConfig;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.Pose;
-
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
-	public static final int RADIUS = 64;
 	private static final String WEIGHT_INIT_TAG = EFProgressiveDiff.MODID + ":weight_initialized";
 	
 	@SuppressWarnings("null")
@@ -46,7 +43,7 @@ public class MobEvents {
 	}
 
 	public static double getDifficultyAround(Entity entity) {
-		return getDifficultyAround(entity, RADIUS);
+		return getDifficultyAround(entity, PDConfig.getGroupRadius());
 	}
 
 	@SuppressWarnings("null")
@@ -71,6 +68,19 @@ public class MobEvents {
 		mob.getPersistentData().putBoolean(WEIGHT_INIT_TAG, true);
 	}
 
+	@SubscribeEvent
+	public static void onXpDrop(LivingExperienceDropEvent event) {
+		if (!(event.getEntity() instanceof Mob mob)) return;
+		if (mob.level().isClientSide()) return;
+		if (event.getAttackingPlayer() instanceof ServerPlayer serverPlayer) {
+			double exp = event.getDroppedExperience();
+			serverPlayer.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
+				int newEXP = (int) Math.round(exp * (1 + PDConfig.getExpBonus() * cap.getAroundDifficulty()));
+				event.setDroppedExperience(Math.max(0, newEXP));
+			});
+		}
+	}
+
 	private static void applyDifficultyScaling(Mob entity, double averageDifficulty) {
 		AttributeInstance weight = entity.getAttribute(EpicFightAttributes.WEIGHT.get());
 		AttributeInstance impact = entity.getAttribute(EpicFightAttributes.IMPACT.get());
@@ -80,28 +90,28 @@ public class MobEvents {
 		if(weight == null || impact == null || stunArmor == null || maxStrikes == null || armorNegation == null) return;
 
 		double amount;
-		double WEIGHT_BASE_VALUE = PDConfig.weightBaseValue;
-		double IMPACT_BASE_VALUE = PDConfig.impactBaseValue;
-		double STUN_ARMOR_BASE_VALUE = PDConfig.stunArmorBaseValue;
-		double MAX_STRIKES_BASE_VALUE = PDConfig.maxStrikesBaseValue;
-		double ARMOR_NEGATION_BASE_VALUE = PDConfig.armorNegationBaseValue;
+		double WEIGHT_BASE_VALUE = PDConfig.getWeightBaseValue();
+		double IMPACT_BASE_VALUE = PDConfig.getImpactBaseValue();
+		double STUN_ARMOR_BASE_VALUE = PDConfig.getStunArmorBaseValue();
+		double MAX_STRIKES_BASE_VALUE = PDConfig.getMaxStrikesBaseValue();
+		double ARMOR_NEGATION_BASE_VALUE = PDConfig.getArmorNegationBaseValue();
 
-		amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.impactMultiply*averageDifficulty);
-		impact.setBaseValue(amount);
-		amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.stunArmorMultiply*averageDifficulty);
-		stunArmor.setBaseValue(amount);
-		amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.maxStrikesMultiply*averageDifficulty));
-		maxStrikes.setBaseValue(amount);
-		amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.armorNegationMultiply*averageDifficulty));
-		armorNegation.setBaseValue(amount);
+		amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.getImpactMultiplierValue()*averageDifficulty);
+		impact.setBaseValue(Math.max(0, amount));
+		amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.getStunArmorMultiplierValue()*averageDifficulty);
+		stunArmor.setBaseValue(Math.max(0, amount));
+		amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.getMaxStrikesMultiplierValue()*averageDifficulty));
+		maxStrikes.setBaseValue(Math.max(0, amount));
+		amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.getArmorNegationMultiplierValue()*averageDifficulty));
+		armorNegation.setBaseValue(Math.max(0, amount));
 
 		if(weight.getBaseValue() == 0.0D) {
 			EntityDimensions dims = entity.getDimensions(Pose.STANDING);
 			double newWeight = dims.width * dims.height * LivingEntityPatch.WEIGHT_CORRECTION;
-			weight.setBaseValue(newWeight);
+			weight.setBaseValue(Math.max(0, newWeight));
 		}
-		amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.weightMultiply*averageDifficulty);
-		weight.setBaseValue(amount);
+		amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.getWeightMultiplierValue()*averageDifficulty);
+		weight.setBaseValue(Math.max(0, amount));
 	}
 
 	@SuppressWarnings("null")
@@ -121,15 +131,15 @@ public class MobEvents {
 			totalWeight += weight;
 		}
 		double averageDifficulty = totalWeight > 0 ? totalDifficulty / totalWeight : 0;
-		averageDifficulty += averageDifficulty * (PDConfig.groupBonus * Math.max(0, nearbyPlayers.size()-1));
-		
-		ResourceKey<Level> dimension = entity.level().dimension();
-		double dimensionBonus = 0.0d;
-		if (dimension == Level.OVERWORLD) dimensionBonus = PDConfig.overworldBonus;
-		else if (dimension == Level.NETHER) dimensionBonus = PDConfig.netherBonus;
-		else if (dimension == Level.END) dimensionBonus = PDConfig.theendBonus;
-		else dimensionBonus = PDConfig.otherBonus;
-		averageDifficulty += averageDifficulty * dimensionBonus;
-		return Math.min(averageDifficulty, PDConfig.maxDifficultyCap);
+		averageDifficulty += averageDifficulty * (PDConfig.getGroupBonus() * Math.max(0, nearbyPlayers.size()-1));
+
+		double dimensionBonus = PDConfig.getDimensionBonus(entity.level().dimension().location());
+		double biomeBonus = 0.0d;
+		Optional<ResourceKey<Biome>> biomeKey = entity.level().getBiome(mobPos).unwrapKey();
+		if (biomeKey.isPresent()) {
+			biomeBonus = PDConfig.getBiomeBonus(biomeKey.get().location());
+		}
+		averageDifficulty *= 1 + dimensionBonus + biomeBonus;
+		return Math.min(averageDifficulty, PDConfig.getMaxDiff());
 	}
 }
