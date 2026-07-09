@@ -13,15 +13,13 @@ public class ClientHandler {
     public static void handle(DifficultySyncPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player == null) {
-            context.setPacketHandled(true);
-            return;
+        if(mc.player != null) {
+            mc.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
+                cap.setMaxDifficulty(msg.maxDiff);
+                cap.setDifficulty(msg.difficulty);
+                cap.setAroundDifficulty(msg.aroundDifficulty);
+            });
         }
-        mc.player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-            cap.setDifficulty(msg.difficulty);
-            cap.setAroundDifficulty(msg.aroundDifficulty);
-            cap.setMaxDifficulty(msg.maxDiff);
-        });
         context.setPacketHandled(true);
     }
 }

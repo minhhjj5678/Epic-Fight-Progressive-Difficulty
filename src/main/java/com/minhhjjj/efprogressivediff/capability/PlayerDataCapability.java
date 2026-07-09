@@ -21,13 +21,13 @@ import com.minhhjjj.efprogressivediff.network.DifficultySyncPacket;
 import com.minhhjjj.efprogressivediff.network.PacketHandler;
 
 public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag> {
-    public static Capability<PlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<PlayerDataCapability>() {});
+    public static Capability<PlayerDataCapability> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});
     private final LazyOptional<PlayerDataCapability> holder = LazyOptional.of(() -> this);
-    public static final double DEVATION_THRESHOLD = 0.1;
+    public static final double DEVIATION_THRESHOLD = 0.1;
 
     private double difficulty = 0;
     private double aroundDifficulty = 0;
-    private double maxDifficulty = 0;
+    private double maxDifficulty = PDConfig.getMaxDiff();
     private double lastMaxDiff = 0;
     private int tickCounter = 0;
     private int debugCounter = 0;
@@ -75,7 +75,7 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
         tickCounter++;
         if(tickCounter >= 20) {
             BlockPos currentPos = player.blockPosition();
-            if (lastPos != null && currentPos.equals(lastPos)) {
+            if (currentPos.equals(lastPos)) {
                 idleTime++;
             } else {
                 lastPos = currentPos;
@@ -87,7 +87,8 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
 
             setAroundDifficulty(player);
             double diff = Math.abs(lastSentDifficulty - aroundDifficulty);
-            if (diff >= DEVATION_THRESHOLD || maxDifficulty < 1 || maxDifficulty != lastMaxDiff) {
+            if (diff >= DEVIATION_THRESHOLD || maxDifficulty < 1 || maxDifficulty != lastMaxDiff) {
+                lastMaxDiff = maxDifficulty > 1 ? maxDifficulty : lastMaxDiff;
                 lastSentDifficulty = aroundDifficulty;
                 DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty, maxDifficulty < 1 ? PDConfig.getMaxDiff() : this.maxDifficulty);
                 PacketHandler.channel.sendTo(msg, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
@@ -96,6 +97,7 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
         }
     }
 
+    @SuppressWarnings("unused")
     public void debug() {
         debugCounter++;
         if(debugCounter >= 200) {
