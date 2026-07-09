@@ -28,7 +28,6 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
     private double difficulty = 0;
     private double aroundDifficulty = 0;
     private double maxDifficulty = PDConfig.getMaxDiff();
-    private double lastMaxDiff = 0;
     private int tickCounter = 0;
     private int debugCounter = 0;
     private double lastSentDifficulty = 0;
