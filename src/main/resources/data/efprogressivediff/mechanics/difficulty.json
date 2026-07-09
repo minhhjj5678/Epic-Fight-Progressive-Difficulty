@@ -1,11 +1,44 @@
 {
+  "_comment_disabled": "Set to false to enable this datapack and override the default mod config.",
   "disabled": false,
-  "maxDifficulty": 300,
-  "difficultyIncrement": 1.0,
-  "afkIncrement": 1.2,
-  "afkTime": 300,
-  "wakeupIncrement": 5.0,
-  "respawnIncrement": -10.0,
-  "groupBonus": 2.5,
-  "groupRadius": 64
+  "maxDifficulty": 100,
+
+  "_comment_difficultyIncrement": "The amount of difficulty added per tick. This is the main way difficulty increases, and is applied when the player is active.",
+  "difficultyIncrement": 0.00005,
+
+  "_comment_afkIncrement": "The amount of difficulty added per tick when the player is AFK. This is applied when the player is idle for more than afkTime seconds.",
+  "afkIncrement": 0.000083,
+
+  "_comment_afkTime": "The amount of idle time in seconds before a player is considered AFK. [Min: 1]",
+  "afkTime": 120,
+
+  "_comment_wakeupIncrement": "The amount of difficulty added when the player wakes up from sleep.",
+  "wakeupIncrement": 0.0,
+
+  "_comment_respawnIncrement": "The amount of difficulty added when the player respawns. Can be negative to reduce difficulty on death.",
+  "respawnIncrement": -2.5,
+
+  "_comment_hostileIncrement": "The amount of difficulty added when the player kills a hostile mob.",
+  "hostileIncrement": 0.003,
+
+  "_comment_neutralIncrement": "The amount of difficulty added when the player kills a neutral mob.",
+  "neutralIncrement": 0.0,
+
+  "_comment_mobIncrements": "Additional difficulty added when the player kills specific mobs. Each entry defines a difficulty increment and a list of affected mob IDs.",
+  "mobIncrements": [
+    {
+      "increment": 2,
+      "mobs": [
+        "minecraft:warden",
+        "minecraft:wither",
+        "minecraft:elder_guardian"
+      ]
+    },
+    {
+      "increment": 5,
+      "mobs": [
+        "minecraft:ender_dragon"
+      ]
+    }
+  ]
 }

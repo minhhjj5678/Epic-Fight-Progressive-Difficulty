@@ -1,0 +1,36 @@
+{
+  "_comment_disabled": "Set to false to enable this datapack and override the default mod config.",
+  "disabled": false,
+
+  "_comment_formula": "Final attribute value = Original Attribute Value + Base Value * (1 + multiply * difficulty)",
+
+  "_comment_weightBase": "Base value added to weight at difficulty 0. [Min: 0]",
+  "weightBase": 10.0,
+
+  "_comment_weightMultiply": "How much the added weight increases per difficulty. For example, a value of 0.05 means the added weight increases by 5% per difficulty. [Min: 0, Max: 1]",
+  "weightMultiply": 0.1,
+
+  "_comment_impactBase": "Base value added to impact at difficulty 0. [Min: 0]",
+  "impactBase": 1.0,
+
+  "_comment_impactMultiply": "How much the added impact increases per difficulty. For example, a value of 0.05 means the added impact increases by 5% per difficulty. [Min: 0, Max: 1]",
+  "impactMultiply": 0.25,
+
+  "_comment_stunArmorBase": "Base value added to stun armor at difficulty 0. [Min: 0]",
+  "stunArmorBase": 3.0,
+
+  "_comment_stunArmorMultiply": "How much the added stun armor increases per difficulty. For example, a value of 0.05 means the added stun armor increases by 5% per difficulty. [Min: 0, Max: 1]",
+  "stunArmorMultiply": 0.25,
+
+  "_comment_armorNegationBase": "Base value added to armor negation at difficulty 0. [Min: 0]",
+  "armorNegationBase": 5.0,
+
+  "_comment_armorNegationMultiply": "How much the added armor negation increases per difficulty. For example, a value of 0.05 means the added armor negation increases by 5% per difficulty. [Min: 0, Max: 1]",
+  "armorNegationMultiply": 0.05,
+
+  "_comment_maxStrikesBase": "Base value added to max strikes at difficulty 0. [Min: 0]",
+  "maxStrikesBase": 1.0,
+
+  "_comment_maxStrikesMultiply": "How much the added max strikes increases per difficulty. For example, a value of 0.03 means the added max strikes increases by 3% per difficulty. [Min: 0, Max: 1]",
+  "maxStrikesMultiply": 0.03
+}
