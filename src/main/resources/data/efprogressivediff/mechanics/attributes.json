@@ -1,6 +1,6 @@
 {
   "_comment_disabled": "Set to false to enable this datapack and override the default mod config.",
-  "disabled": false,
+  "disabled": true,
 
   "_comment_formula": "Final attribute value = Original Attribute Value + Base Value * (1 + multiply * difficulty)",
 

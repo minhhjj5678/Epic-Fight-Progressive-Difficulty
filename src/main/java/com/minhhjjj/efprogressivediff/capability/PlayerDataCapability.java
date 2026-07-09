@@ -87,10 +87,10 @@ public class PlayerDataCapability implements ICapabilitySerializable<CompoundTag
 
             setAroundDifficulty(player);
             double diff = Math.abs(lastSentDifficulty - aroundDifficulty);
-            if (diff >= DEVIATION_THRESHOLD || maxDifficulty < 1 || maxDifficulty != lastMaxDiff) {
-                lastMaxDiff = maxDifficulty > 1 ? maxDifficulty : lastMaxDiff;
+            if (diff >= DEVIATION_THRESHOLD || maxDifficulty != PDConfig.getMaxDiff()) {
+                maxDifficulty = PDConfig.getMaxDiff();
                 lastSentDifficulty = aroundDifficulty;
-                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty, maxDifficulty < 1 ? PDConfig.getMaxDiff() : this.maxDifficulty);
+                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty, maxDifficulty);
                 PacketHandler.channel.sendTo(msg, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
             tickCounter = 0;

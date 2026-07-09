@@ -1,6 +1,6 @@
 {
   "_comment_disabled": "Set to false to enable this datapack and override the default mod config.",
-  "disabled": false,
+  "disabled": true,
   "maxDifficulty": 100,
 
   "_comment_difficultyIncrement": "The amount of difficulty added per tick. This is the main way difficulty increases, and is applied when the player is active.",

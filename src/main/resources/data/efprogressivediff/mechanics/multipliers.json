@@ -1,6 +1,6 @@
 {
   "_comment_disabled": "Set to false to enable this datapack and override the default mod config.",
-  "disabled": false,
+  "disabled": true,
 
   "_comment_expBonus": "The experience multiplier per difficulty point. Formula for dropped exp: base_exp * (1 + difficulty * exp_bonus). [Min: 0]",
   "expBonus": 0.005,
