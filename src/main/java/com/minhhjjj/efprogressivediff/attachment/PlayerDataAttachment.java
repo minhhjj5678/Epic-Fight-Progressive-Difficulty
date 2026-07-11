@@ -45,6 +45,7 @@ public class PlayerDataAttachment implements INBTSerializable<CompoundTag> {
 
     private double difficulty = 0;
     private double aroundDifficulty = 0;
+    private double maxDifficulty = PDConfig.getMaxDiff();
     private int tickCounter = 0;
     private int debugCounter = 0;
     private double lastSentDifficulty = 0;
@@ -68,6 +69,8 @@ public class PlayerDataAttachment implements INBTSerializable<CompoundTag> {
         return aroundDifficulty;
     }
 
+    public double getMaxDifficulty() { return  this.maxDifficulty; }
+
     public void setAroundDifficulty(ServerPlayer player) {
         aroundDifficulty = MobEvents.getDifficultyAround(player);
     }
@@ -76,10 +79,16 @@ public class PlayerDataAttachment implements INBTSerializable<CompoundTag> {
         this.aroundDifficulty = aroundDifficulty;
     }
 
+    public void setMaxDifficulty(double maxDifficulty) {
+        if (maxDifficulty > 0) {
+            this.maxDifficulty = maxDifficulty;
+        }
+    }
+
     public void setDifficulty(double difficulty) {
         if(Double.compare(this.difficulty, difficulty) != 0) {
             this.difficulty = difficulty;
-            this.difficulty = Mth.clamp(this.difficulty, 0d, PDConfig.maxDifficultyCap);
+            this.difficulty = Mth.clamp(this.difficulty, 0d, PDConfig.getMaxDiff());
         }
     }
 
@@ -103,14 +112,15 @@ public class PlayerDataAttachment implements INBTSerializable<CompoundTag> {
                 idleTime = 0;
             }
 
-            if (idleTime <= PDConfig.afkTime) addDifficulty(PDConfig.difficultyIncrement);
-            else addDifficulty(PDConfig.afkIncrement);
+            if (idleTime <= PDConfig.getAfkTime()) addDifficulty(PDConfig.getDifficultyIncrement());
+            else addDifficulty(PDConfig.getAfkIncrement());
 
             setAroundDifficulty(player);
             double diff = Math.abs(lastSentDifficulty - aroundDifficulty);
-            if (diff >= DEVATION_THRESHOLD) {
+            if (diff >= DEVATION_THRESHOLD || this.maxDifficulty != PDConfig.getMaxDiff()) {
+                this.maxDifficulty = PDConfig.getMaxDiff();
                 lastSentDifficulty = aroundDifficulty;
-                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty);
+                DifficultySyncPacket msg = new DifficultySyncPacket(this.difficulty, aroundDifficulty, this.maxDifficulty);
                 PacketDistributor.sendToPlayer(player, msg);
             }
             tickCounter = 0;

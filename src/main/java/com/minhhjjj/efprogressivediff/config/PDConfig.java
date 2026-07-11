@@ -1,5 +1,11 @@
 package com.minhhjjj.efprogressivediff.config;
 
+import com.minhhjjj.efprogressivediff.data.AttributeModifier;
+import com.minhhjjj.efprogressivediff.data.DataListener;
+import com.minhhjjj.efprogressivediff.data.DifficultyModifier;
+import com.minhhjjj.efprogressivediff.data.MultiplierModifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -19,7 +25,10 @@ public class PDConfig {
     private static final ModConfigSpec.DoubleValue RESPAWN_INCREMENT;
     private static final ModConfigSpec.DoubleValue HOSTILE_INCREMENT;
     private static final ModConfigSpec.DoubleValue NEUTRAL_INCREMENT;
+
+    private static final ModConfigSpec.DoubleValue EXP_BONUS;
     private static final ModConfigSpec.DoubleValue GROUP_BONUS;
+    private static final ModConfigSpec.IntValue GROUP_RADIUS;
     private static final ModConfigSpec.DoubleValue OVERWORLD_BONUS;
     private static final ModConfigSpec.DoubleValue NETHER_BONUS;
     private static final ModConfigSpec.DoubleValue THEEND_BONUS;
@@ -51,11 +60,11 @@ public class PDConfig {
 
                 DIFFICULTY_INCREMENT = BUILDER
                         .comment("The amount of difficulty added per tick. This is the main way difficulty increases, and is applied when the player is active.")
-                        .defineInRange("difficultyIncrement", 0.00083d, 0d, Double.MAX_VALUE);
+                        .defineInRange("difficultyIncrement", 0.00083d, -Double.MAX_VALUE, Double.MAX_VALUE);
 
                 AFK_INCREMENT = BUILDER
                         .comment("The amount of difficulty added per tick when the player is AFK. This is applied when the player is idle for more than afkTime seconds.")
-                        .defineInRange("afkIncrement", 0.000083d, 0d, Double.MAX_VALUE);
+                        .defineInRange("afkIncrement", 0.000083d, -Double.MAX_VALUE, Double.MAX_VALUE);
 
                 AFK_TIME = BUILDER
                         .comment("The amount of idle time in seconds before a player is considered AFK.")
@@ -67,11 +76,11 @@ public class PDConfig {
 
                 RESPAWN_INCREMENT = BUILDER
                         .comment("The amount of difficulty added when the player respawns. Can be negative to reduce difficulty on death.")
-                        .defineInRange("respawnIncrement", -5d, -Double.MAX_VALUE, Double.MAX_VALUE);
+                        .defineInRange("respawnIncrement", -2.5d, -Double.MAX_VALUE, Double.MAX_VALUE);
 
                 HOSTILE_INCREMENT = BUILDER
                         .comment("The amount of difficulty added when the player kills a hostile mob.")
-                        .defineInRange("hostileIncrement", 0.0d, -Double.MAX_VALUE, Double.MAX_VALUE);
+                        .defineInRange("hostileIncrement", 0.003d, -Double.MAX_VALUE, Double.MAX_VALUE);
 
                 NEUTRAL_INCREMENT = BUILDER
                         .comment("The amount of difficulty added when the player kills a neutral mob.")
@@ -80,9 +89,18 @@ public class PDConfig {
 
                 BUILDER.comment("Settings related to difficulty bonuses based on player grouping and dimension.")
                 .push("Difficulty Bonus");
+
+                EXP_BONUS = BUILDER
+                        .comment("The experience multiplier per difficulty point. Formula for dropped exp: base_exp * (1 + difficulty * exp_bonus).")
+                        .defineInRange("expBonus", 0.005, 0.0d, Double.MAX_VALUE);
+
                 GROUP_BONUS = BUILDER
                         .comment("Additional difficulty multiplier based on the number of nearby players. For example, a value of 0.1 means each additional player increases the average difficulty by 10%.")
                         .defineInRange("groupBonus", 0.05, 0.0d, Double.MAX_VALUE);
+
+                GROUP_RADIUS = BUILDER
+                        .comment("The radius around the newly spawned mob (in blocks) to check for nearby players for the group bonus.")
+                        .defineInRange("groupRadius", 128, 0, Integer.MAX_VALUE);
 
                 OVERWORLD_BONUS = BUILDER
                         .comment("Additional difficulty multiplier for being in the Overworld. For example, a value of 0.1 means the difficulty is increased by 10% in the Overworld.")
@@ -90,11 +108,11 @@ public class PDConfig {
 
                 NETHER_BONUS = BUILDER
                         .comment("Additional difficulty multiplier for being in the Nether. For example, a value of 0.1 means the difficulty is increased by 10% in the Nether.")
-                        .defineInRange("netherBonus", 0.1d, 0.0d, Double.MAX_VALUE);
+                        .defineInRange("netherBonus", 0.5d, 0.0d, Double.MAX_VALUE);
 
                 THEEND_BONUS = BUILDER
                         .comment("Additional difficulty multiplier for being in The End. For example, a value of 0.15 means the difficulty is increased by 15% in The End.")
-                        .defineInRange("theendBonus", 0.15d, 0.0d, Double.MAX_VALUE);
+                        .defineInRange("theendBonus", 1.25d, 0.0d, Double.MAX_VALUE);
 
                 OTHER_BONUS = BUILDER
                         .comment("Additional difficulty multiplier for being in other dimensions (modded dimensions). For example, a value of 0.1 means the difficulty is increased by 10% in other dimensions.")
@@ -112,7 +130,7 @@ public class PDConfig {
 
                 WEIGHT_MULTIPLY = BUILDER
                         .comment("How much the added weight increases per difficulty. For example, a value of 0.05 means the added weight increases by 5% per difficulty.")
-                        .defineInRange("weightMultiply", 0.07, 0, 1);
+                        .defineInRange("weightMultiply", 0.1, 0, 1);
                 BUILDER.pop();
 
                 BUILDER.push("Impact");
@@ -122,7 +140,7 @@ public class PDConfig {
 
                 IMPACT_MULTIPLY = BUILDER
                         .comment("How much the added impact increases per difficulty. For example, a value of 0.05 means the added impact increases by 5% per difficulty.")
-                        .defineInRange("impactMultiply", 0.05, 0, 1);
+                        .defineInRange("impactMultiply", 0.35, 0, 1);
                 BUILDER.pop();
 
                 BUILDER.push("Stun Armor");
@@ -132,7 +150,7 @@ public class PDConfig {
 
                 STUN_ARMOR_MULTIPLY = BUILDER
                         .comment("How much the added stun armor increases per difficulty. For example, a value of 0.05 means the added stun armor increases by 5% per difficulty.")
-                        .defineInRange("stunArmorMultiply", 0.05, 0, 1);
+                        .defineInRange("stunArmorMultiply", 0.3, 0, 1);
                 BUILDER.pop();
 
                 BUILDER.push("Armor Negation");
@@ -152,37 +170,40 @@ public class PDConfig {
 
                 MAX_STRIKES_MULTIPLY = BUILDER
                         .comment("How much the added max strikes increases per difficulty. For example, a value of 0.03 means the added max strikes increases by 3% per difficulty.")
-                        .defineInRange("maxStrikesMultiply", 0.03, 0, 1);
+                        .defineInRange("maxStrikesMultiply", 0.3, 0, 1);
                 BUILDER.pop();
         BUILDER.pop();
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 
-    public static double maxDifficultyCap;
-    public static double difficultyIncrement;
-    public static double afkIncrement;
-    public static int afkTime;
-    public static double wakeUpIncrement;
-    public static double respawnIncrement;
-    public static double hostileIncrement;
-    public static double neutralIncrement;
-    public static double groupBonus;
-    public static double overworldBonus;
-    public static double netherBonus;
-    public static double theendBonus;
-    public static double otherBonus;
+    private static double maxDifficultyCap;
+    private static double difficultyIncrement;
+    private static double afkIncrement;
+    private static int afkTime;
+    private static double wakeUpIncrement;
+    private static double respawnIncrement;
+    private static double hostileIncrement;
+    private static double neutralIncrement;
 
-    public static double weightBaseValue;
-    public static double weightMultiply;
-    public static double impactBaseValue;
-    public static double impactMultiply;
-    public static double stunArmorBaseValue;
-    public static double stunArmorMultiply;
-    public static double armorNegationBaseValue;
-    public static double armorNegationMultiply;
-    public static double maxStrikesBaseValue;
-    public static double maxStrikesMultiply;
+    private static double expBonus;
+    private static double groupBonus;
+    private static int groupRadius;
+    private static double overworldBonus;
+    private static double netherBonus;
+    private static double theendBonus;
+    private static double otherBonus;
+
+    private static double weightBaseValue;
+    private static double weightMultiply;
+    private static double impactBaseValue;
+    private static double impactMultiply;
+    private static double stunArmorBaseValue;
+    private static double stunArmorMultiply;
+    private static double armorNegationBaseValue;
+    private static double armorNegationMultiply;
+    private static double maxStrikesBaseValue;
+    private static double maxStrikesMultiply;
 
 //     private static boolean validateItemName(final Object obj)
 //     {
@@ -201,7 +222,10 @@ public class PDConfig {
                 respawnIncrement = RESPAWN_INCREMENT.get();
                 hostileIncrement = HOSTILE_INCREMENT.get();
                 neutralIncrement = NEUTRAL_INCREMENT.get();
+
+                expBonus = EXP_BONUS.get();
                 groupBonus = GROUP_BONUS.get();
+                groupRadius = GROUP_RADIUS.get();
                 overworldBonus = OVERWORLD_BONUS.get();
                 netherBonus = NETHER_BONUS.get();
                 theendBonus = THEEND_BONUS.get();
@@ -218,5 +242,163 @@ public class PDConfig {
                 armorNegationBaseValue = ARMOR_NEGATION_BASE_VALUE.get();
                 maxStrikesBaseValue = MAX_STRIKES_BASE_VALUE.get();
         }
+    }
+
+    private static final ResourceLocation RL_DIFF = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, DifficultyModifier.FILE);
+    private static final ResourceLocation RL_MULTIPLIERS = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, MultiplierModifier.FILE);
+    private static final ResourceLocation RL_ATTRIBUTE = ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, AttributeModifier.FILE);
+    static boolean isDifficultyPackLoaded() {
+        return DataListener.DIFFICULTY_MODIFIER.containsKey(RL_DIFF)
+                && !DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).disabled;
+    }
+
+    static boolean isMultiplierPackLoaded() {
+        return DataListener.MULTIPLIER_MODIFIER.containsKey(RL_MULTIPLIERS)
+                && !DataListener.MULTIPLIER_MODIFIER.get(RL_MULTIPLIERS).disabled;
+    }
+
+    static boolean isAttributePackLoaded() {
+        return DataListener.ATTRIBUTE_MODIFIER.containsKey(RL_ATTRIBUTE)
+                && !DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).disabled;
+    }
+
+    public static double getMaxDiff() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).maxDifficulty : maxDifficultyCap;
+    }
+
+    public static double getDifficultyIncrement() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).difficultyIncrement : difficultyIncrement;
+    }
+
+    public static int getAfkTime() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).afkTime : afkTime;
+    }
+
+    public static double getAfkIncrement() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).afkIncrement : afkIncrement;
+    }
+
+    public static double getWakeupIncrement() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).wakeupIncrement : wakeUpIncrement;
+    }
+
+    public static double getRespawnIncrement() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).respawnIncrement : respawnIncrement;
+    }
+
+    public static double getHostileIncrement() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).hostileIncrement : hostileIncrement;
+    }
+
+    public static double getNeutralIncrement() {
+        return isDifficultyPackLoaded() ? DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).neutralIncrement : neutralIncrement;
+    }
+
+    public static double getMobIncrement(ResourceLocation rl) {
+        if (isDifficultyPackLoaded() && rl != null) {
+            for (DifficultyModifier.MobIncrement mobModifier : DataListener.DIFFICULTY_MODIFIER.get(RL_DIFF).mobIncrements) {
+                if (mobModifier.mobs.contains(rl)) {
+                    return mobModifier.increment;
+                }
+            }
+        }
+        return 0.0d;
+    }
+
+    public static double getExpBonus() {
+        return isMultiplierPackLoaded() ? DataListener.MULTIPLIER_MODIFIER.get(RL_MULTIPLIERS).expBonus : expBonus;
+    }
+
+    public static double getGroupBonus() {
+        return isMultiplierPackLoaded() ? DataListener.MULTIPLIER_MODIFIER.get(RL_MULTIPLIERS).groupBonus : groupBonus;
+    }
+
+    public static int getGroupRadius() {
+        return isMultiplierPackLoaded() ? DataListener.MULTIPLIER_MODIFIER.get(RL_MULTIPLIERS).groupRadius : groupRadius;
+    }
+
+    public static double getDimensionBonus(ResourceLocation rl) {
+        if (rl == null) return 0.0d;
+        if (isMultiplierPackLoaded()) {
+            double scaleFactor = 0.0;
+            boolean found = false;
+            for (MultiplierModifier.DimensionMultiplier dim : DataListener.MULTIPLIER_MODIFIER.get(RL_MULTIPLIERS).dimensionMultipliers) {
+                if (dim.dimensions.contains(rl)) {
+                    if (found) {
+                        DataListener.LOGGER.warn("Multiple scales detected for multiplier {}, using the last scale from the file", rl.toString());
+                    }
+                    scaleFactor = dim.dimensionScale;
+                    found = true;
+                }
+            }
+            return scaleFactor;
+        }
+
+        if (rl.equals(Level.OVERWORLD.location())) {
+            return overworldBonus;
+        } else if (rl.equals(Level.NETHER.location())) {
+            return netherBonus;
+        } else if (rl.equals(Level.END.location())) {
+            return theendBonus;
+        } else {
+            return otherBonus;
+        }
+    }
+
+    public static double getBiomeBonus(ResourceLocation rl) {
+        double scaleFactor = 0.0;
+        if (isMultiplierPackLoaded() && rl != null) {
+            boolean found = false;
+            for (MultiplierModifier.BiomeMultiplier bio : DataListener.MULTIPLIER_MODIFIER.get(RL_MULTIPLIERS).biomeMultipliers) {
+                if (bio.biomes.contains(rl)) {
+                    if (found) {
+                        DataListener.LOGGER.warn("Multiple scales detected for multiplier {}, using the last scale from the file", rl.toString());
+                    }
+                    scaleFactor = bio.biomeScale;
+                    found = true;
+                }
+            }
+        }
+        return scaleFactor;
+    }
+
+    public static double getWeightBaseValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).weightBase : weightBaseValue;
+    }
+
+    public static double getWeightMultiplierValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).weightMultiply : weightMultiply;
+    }
+
+    public static double getImpactBaseValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).impactBase : impactBaseValue;
+    }
+
+    public static double getImpactMultiplierValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).impactMultiply : impactMultiply;
+    }
+
+    public static double getStunArmorBaseValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).stunArmorBase : stunArmorBaseValue;
+    }
+
+    public static double getStunArmorMultiplierValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).stunArmorMultiply : stunArmorMultiply;
+    }
+
+    public static double getArmorNegationBaseValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).armorNegationBase : armorNegationBaseValue;
+    }
+
+    public static double getArmorNegationMultiplierValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).armorNegationMultiply : armorNegationMultiply;
+    }
+
+    public static double getMaxStrikesBaseValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).maxStrikesBase : maxStrikesBaseValue;
+    }
+
+    public static double getMaxStrikesMultiplierValue() {
+        return isAttributePackLoaded() ? DataListener.ATTRIBUTE_MODIFIER.get(RL_ATTRIBUTE).maxStrikesMultiply : maxStrikesMultiply;
     }
 }

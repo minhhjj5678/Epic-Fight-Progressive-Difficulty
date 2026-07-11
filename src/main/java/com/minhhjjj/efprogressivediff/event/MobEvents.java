@@ -1,7 +1,10 @@
 package com.minhhjjj.efprogressivediff.event;
 
+import com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.biome.Biome;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import yesman.epicfight.registry.entries.EpicFightAttributes;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
@@ -9,6 +12,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 
@@ -31,8 +35,8 @@ import static com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment.typ
 
 @EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
-	public static final int RADIUS = 64;
 	private static final String WEIGHT_INIT_TAG = EFProgressiveDiff.MODID + ":weight_initialized";
+	private static final String DIFFICULTY_STORED = EFProgressiveDiff.MODID + ":difficulty_stored";
 	
 	@SuppressWarnings("null")
 	@SubscribeEvent
@@ -47,7 +51,7 @@ public class MobEvents {
 	}
 
 	public static double getDifficultyAround(Entity entity) {
-		return getDifficultyAround(entity, RADIUS);
+		return getDifficultyAround(entity, PDConfig.getGroupRadius());
 	}
 
 	@SuppressWarnings("null")
@@ -69,6 +73,17 @@ public class MobEvents {
 		mob.getPersistentData().putBoolean(WEIGHT_INIT_TAG, true);
 	}
 
+	@SubscribeEvent
+	public static void onXpDrop(LivingExperienceDropEvent event) {
+		if (!(event.getEntity() instanceof Mob mob)) return;
+		if (mob.level().isClientSide()) return;
+		if (event.getAttackingPlayer() instanceof ServerPlayer serverPlayer) {
+			double exp = event.getDroppedExperience();
+			int newEXP = (int) Math.round(exp * (1 + PDConfig.getExpBonus() * mob.getPersistentData().getDouble(DIFFICULTY_STORED)));
+			event.setDroppedExperience(Math.max(0, newEXP));
+		}
+	}
+
 	@SuppressWarnings("null")
 	private static void applyDifficultyScaling(Mob entity, double averageDifficulty) {
 		AttributeInstance weight = entity.getAttribute(attributeHolder(EpicFightAttributes.WEIGHT));
@@ -79,19 +94,19 @@ public class MobEvents {
 		if(weight == null || impact == null || stunArmor == null || maxStrikes == null || armorNegation == null) return;
 
 		double amount;
-		double WEIGHT_BASE_VALUE = PDConfig.weightBaseValue;
-		double IMPACT_BASE_VALUE = PDConfig.impactBaseValue;
-		double STUN_ARMOR_BASE_VALUE = PDConfig.stunArmorBaseValue;
-		double MAX_STRIKES_BASE_VALUE = PDConfig.maxStrikesBaseValue;
-		double ARMOR_NEGATION_BASE_VALUE = PDConfig.armorNegationBaseValue;
+		double WEIGHT_BASE_VALUE = PDConfig.getWeightBaseValue();
+		double IMPACT_BASE_VALUE = PDConfig.getImpactBaseValue();
+		double STUN_ARMOR_BASE_VALUE = PDConfig.getStunArmorBaseValue();
+		double MAX_STRIKES_BASE_VALUE = PDConfig.getMaxStrikesBaseValue();
+		double ARMOR_NEGATION_BASE_VALUE = PDConfig.getArmorNegationBaseValue();
 
-		amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.impactMultiply*averageDifficulty);
+		amount = impact.getBaseValue() + IMPACT_BASE_VALUE*(1+PDConfig.getImpactMultiplierValue()*averageDifficulty);
 		impact.setBaseValue(amount);
-		amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.stunArmorMultiply*averageDifficulty);
+		amount = stunArmor.getBaseValue() + STUN_ARMOR_BASE_VALUE*(1+PDConfig.getStunArmorMultiplierValue()*averageDifficulty);
 		stunArmor.setBaseValue(amount);
-		amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.maxStrikesMultiply*averageDifficulty));
+		amount = maxStrikes.getBaseValue() + (MAX_STRIKES_BASE_VALUE*(1+PDConfig.getMaxStrikesMultiplierValue()*averageDifficulty));
 		maxStrikes.setBaseValue(amount);
-		amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.armorNegationMultiply*averageDifficulty));
+		amount = armorNegation.getBaseValue() + (ARMOR_NEGATION_BASE_VALUE*(1+PDConfig.getArmorNegationMultiplierValue()*averageDifficulty));
 		armorNegation.setBaseValue(amount);
 
 		if(weight.getBaseValue() == 0.0D) {
@@ -99,8 +114,10 @@ public class MobEvents {
 			double newWeight = dims.width() * dims.height() * LivingEntityPatch.WEIGHT_CORRECTION;
 			weight.setBaseValue(newWeight);
 		}
-		amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.weightMultiply*averageDifficulty);
+		amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.getWeightMultiplierValue()*averageDifficulty);
 		weight.setBaseValue(amount);
+
+		entity.getPersistentData().putDouble(DIFFICULTY_STORED, averageDifficulty);
 	}
 
 	@SuppressWarnings("null")
@@ -120,16 +137,17 @@ public class MobEvents {
 			totalWeight += weight;
 		}
 		double averageDifficulty = totalWeight > 0 ? totalDifficulty / totalWeight : 0;
-		averageDifficulty += averageDifficulty * (PDConfig.groupBonus * Math.max(0, nearbyPlayers.size()-1));
+		averageDifficulty += averageDifficulty * (PDConfig.getGroupBonus() * Math.max(0, nearbyPlayers.size()-1));
 		
 		ResourceKey<Level> dimension = entity.level().dimension();
-		double dimensionBonus = 0.0d;
-		if (dimension == Level.OVERWORLD) dimensionBonus = PDConfig.overworldBonus;
-		else if (dimension == Level.NETHER) dimensionBonus = PDConfig.netherBonus;
-		else if (dimension == Level.END) dimensionBonus = PDConfig.theendBonus;
-		else dimensionBonus = PDConfig.otherBonus;
-		averageDifficulty += averageDifficulty * dimensionBonus;
-		return Math.min(averageDifficulty, PDConfig.maxDifficultyCap);
+		double dimensionBonus = PDConfig.getDimensionBonus(dimension.location());
+		double biomeBonus = 0.0d;
+		Optional<ResourceKey<Biome>> biomeKey = entity.level().getBiome(mobPos).unwrapKey();
+		if (biomeKey.isPresent()) {
+			biomeBonus = PDConfig.getBiomeBonus(biomeKey.get().location());
+		}
+		averageDifficulty *= 1 + dimensionBonus + biomeBonus;
+		return Math.min(averageDifficulty, PDConfig.getMaxDiff());
 	}
 
 	private static Holder<net.minecraft.world.entity.ai.attributes.Attribute> attributeHolder(Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute) {

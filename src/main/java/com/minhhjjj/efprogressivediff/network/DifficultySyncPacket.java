@@ -9,9 +9,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 @SuppressWarnings("null")
-public record DifficultySyncPacket(double difficulty, double aroundDifficulty) implements CustomPacketPayload {
+public record DifficultySyncPacket(double difficulty, double aroundDifficulty, double maxDifficulty) implements CustomPacketPayload {
     public static final Type<DifficultySyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(EFProgressiveDiff.MODID, "difficulty_sync"));
-    public static final StreamCodec<ByteBuf, DifficultySyncPacket> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.DOUBLE, DifficultySyncPacket::difficulty, ByteBufCodecs.DOUBLE, DifficultySyncPacket::aroundDifficulty, DifficultySyncPacket::new);
+    public static final StreamCodec<ByteBuf, DifficultySyncPacket> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.DOUBLE, DifficultySyncPacket::difficulty, ByteBufCodecs.DOUBLE, DifficultySyncPacket::aroundDifficulty, ByteBufCodecs.DOUBLE, DifficultySyncPacket::maxDifficulty, DifficultySyncPacket::new);
 
     @Override
     public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

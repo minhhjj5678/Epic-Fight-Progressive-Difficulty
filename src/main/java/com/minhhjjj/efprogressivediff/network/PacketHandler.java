@@ -34,6 +34,7 @@ public class PacketHandler {
             Player player = context.player();
             AttachmentType<PlayerDataAttachment> data = PlayerDataAttachment.PLAYER_DIFFICULTY.get();
             if (data != null) {
+                player.getData(data).setMaxDifficulty(packet.maxDifficulty());
                 player.getData(data).setDifficulty(packet.difficulty());
                 player.getData(data).setAroundDifficulty(packet.aroundDifficulty());
             }

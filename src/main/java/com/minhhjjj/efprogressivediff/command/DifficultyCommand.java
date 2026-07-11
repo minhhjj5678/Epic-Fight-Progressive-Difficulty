@@ -50,9 +50,13 @@ public final class DifficultyCommand {
                 )
                 .then(Commands.literal("set")
                     .then(Commands.argument("players", EntityArgument.players())
-                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D, PDConfig.maxDifficultyCap))
+                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg(0.0D))
                             .executes(context -> {
                                 double amount = DoubleArgumentType.getDouble(context, "amount");
+                                if (amount > PDConfig.getMaxDiff()) {
+                                    context.getSource().sendSystemMessage(Component.translatable("command.efprogressivediff.set.fail", PDConfig.getMaxDiff()));
+                                    return 0;
+                                }
                                 int[] counter = {0};
                                 Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
                                 for (ServerPlayer player : players) {

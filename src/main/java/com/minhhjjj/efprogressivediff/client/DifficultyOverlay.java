@@ -42,7 +42,7 @@ public class DifficultyOverlay implements Layer {
 
         PlayerDataAttachment data = player.getData(type());
         double currentDiff = data.getAroundDifficulty();
-        double maxDiff = PDConfig.maxDifficultyCap;
+        double maxDiff = data.getMaxDifficulty();
         double percentage = Math.min(maxDiff>0 ? currentDiff/maxDiff : 0, 1);
         int barHeight = 10;
         int barWidth = 100;
