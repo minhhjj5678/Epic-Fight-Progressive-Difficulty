@@ -3,10 +3,10 @@
   "disabled": true,
   "maxDifficulty": 100,
 
-  "_comment_difficultyIncrement": "The amount of difficulty added per tick. This is the main way difficulty increases, and is applied when the player is active.",
-  "difficultyIncrement": 0.00005,
+  "_comment_difficultyIncrement": "The amount of difficulty added per second. This is the main way difficulty increases, and is applied when the player is active.",
+  "difficultyIncrement": 0.00083,
 
-  "_comment_afkIncrement": "The amount of difficulty added per tick when the player is AFK. This is applied when the player is idle for more than afkTime seconds.",
+  "_comment_afkIncrement": "The amount of difficulty added per second when the player is AFK. This is applied when the player is idle for more than afkTime seconds.",
   "afkIncrement": 0.000083,
 
   "_comment_afkTime": "The amount of idle time in seconds before a player is considered AFK. [Min: 1]",

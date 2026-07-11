@@ -29,6 +29,7 @@ import com.minhhjjj.efprogressivediff.config.PDConfig;
 @Mod.EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
 	private static final String WEIGHT_INIT_TAG = EFProgressiveDiff.MODID + ":weight_initialized";
+	private static final String DIFFICULTY_STORED = EFProgressiveDiff.MODID + ":difficulty_stored";
 	
 	@SuppressWarnings("null")
 	@SubscribeEvent
@@ -75,7 +76,7 @@ public class MobEvents {
 		if (event.getAttackingPlayer() instanceof ServerPlayer serverPlayer) {
 			double exp = event.getDroppedExperience();
 			serverPlayer.getCapability(PlayerDataCapability.INSTANCE).ifPresent(cap -> {
-				int newEXP = (int) Math.round(exp * (1 + PDConfig.getExpBonus() * cap.getAroundDifficulty()));
+				int newEXP = (int) Math.round(exp * (1 + PDConfig.getExpBonus() * mob.getPersistentData().getDouble(DIFFICULTY_STORED)));
 				event.setDroppedExperience(Math.max(0, newEXP));
 			});
 		}
@@ -112,6 +113,8 @@ public class MobEvents {
 		}
 		amount = weight.getBaseValue() + WEIGHT_BASE_VALUE*(1+PDConfig.getWeightMultiplierValue()*averageDifficulty);
 		weight.setBaseValue(Math.max(0, amount));
+
+		entity.getPersistentData().putDouble(DIFFICULTY_STORED, averageDifficulty);
 	}
 
 	@SuppressWarnings("null")

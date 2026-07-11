@@ -48,6 +48,8 @@ public class PDConfig {
     private static final ForgeConfigSpec.DoubleValue MAX_STRIKES_BASE_VALUE;
     private static final ForgeConfigSpec.DoubleValue MAX_STRIKES_MULTIPLY;
 
+    private static final ForgeConfigSpec.BooleanValue IS_V120_FIXED;
+
     static {
         BUILDER.comment("General settings")
                 .push("General");
@@ -58,11 +60,11 @@ public class PDConfig {
                         .defineInRange("maxDifficultyCap", 100, 0d, Double.MAX_VALUE);
 
                 DIFFICULTY_INCREMENT = BUILDER
-                        .comment("The amount of difficulty added per tick. This is the main way difficulty increases, and is applied when the player is active.")
-                        .defineInRange("difficultyIncrement", 0.00005d, -Double.MAX_VALUE, Double.MAX_VALUE);
+                        .comment("The amount of difficulty added per second. This is the main way difficulty increases, and is applied when the player is active.")
+                        .defineInRange("difficultyIncrement", 0.00083d, -Double.MAX_VALUE, Double.MAX_VALUE);
 
                 AFK_INCREMENT = BUILDER
-                        .comment("The amount of difficulty added per tick when the player is AFK. This is applied when the player is idle for more than afkTime seconds.")
+                        .comment("The amount of difficulty added per second when the player is AFK. This is applied when the player is idle for more than afkTime seconds.")
                         .defineInRange("afkIncrement", 0.000083d, -Double.MAX_VALUE, Double.MAX_VALUE);
 
                 AFK_TIME = BUILDER
@@ -169,6 +171,8 @@ public class PDConfig {
                         .comment("How much the added max strikes increases per difficulty. For example, a value of 0.03 means the added max strikes increases by 3% per difficulty.")
                         .defineInRange("maxStrikesMultiply", 0.03, 0, 1);
                 BUILDER.pop();
+
+                IS_V120_FIXED = BUILDER.comment("Internal flag for bug fixes. Do not modify.").define("is_v120_fixed", false);
         BUILDER.pop();
     }
 
@@ -211,6 +215,7 @@ public class PDConfig {
     static void onLoad(final ModConfigEvent event)
     {
         if (event.getConfig().getSpec() == PDConfig.SPEC) {
+                fixV120(event);
                 maxDifficultyCap = MAX_DIFFICULTY_CAP.get();
                 difficultyIncrement = DIFFICULTY_INCREMENT.get();
                 afkIncrement = AFK_INCREMENT.get();
@@ -238,6 +243,18 @@ public class PDConfig {
                 stunArmorBaseValue = STUN_ARMOR_BASE_VALUE.get();
                 armorNegationBaseValue = ARMOR_NEGATION_BASE_VALUE.get();
                 maxStrikesBaseValue = MAX_STRIKES_BASE_VALUE.get();
+        }
+    }
+
+    private static final double WRONG_VALUE = 0.00005d;
+    private static final double FIX_VALUE = 0.00083d;
+    private static void fixV120(ModConfigEvent event) {
+        if (!IS_V120_FIXED.get()) {
+            IS_V120_FIXED.set(true);
+            if (PDConfig.DIFFICULTY_INCREMENT.get().equals(WRONG_VALUE)) {
+                PDConfig.DIFFICULTY_INCREMENT.set(FIX_VALUE);
+            }
+            event.getConfig().save();
         }
     }
 
