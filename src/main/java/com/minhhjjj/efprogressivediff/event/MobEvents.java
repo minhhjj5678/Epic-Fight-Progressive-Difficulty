@@ -1,9 +1,7 @@
 package com.minhhjjj.efprogressivediff.event;
 
-import com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.Biome;
-import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import yesman.epicfight.registry.entries.EpicFightAttributes;
@@ -11,8 +9,7 @@ import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.minhhjjj.efprogressivediff.EFProgressiveDiff;
 
@@ -35,20 +32,7 @@ import static com.minhhjjj.efprogressivediff.attachment.PlayerDataAttachment.typ
 
 @EventBusSubscriber(modid = EFProgressiveDiff.MODID)
 public class MobEvents {
-	private static final String WEIGHT_INIT_TAG = EFProgressiveDiff.MODID + ":weight_initialized";
 	private static final String DIFFICULTY_STORED = EFProgressiveDiff.MODID + ":difficulty_stored";
-	
-	@SuppressWarnings("null")
-	@SubscribeEvent
-	public static void onSpawn(FinalizeSpawnEvent event) {
-		Mob entity = event.getEntity();
-		if(event.getLevel().isClientSide()) return;
-		if(!(entity.level() instanceof ServerLevel)) return;
-		
-		double averageDifficulty = getDifficultyAround(entity);
-		if (averageDifficulty < 0) return;
-		applyDifficultyScaling(entity, averageDifficulty);
-	}
 
 	public static double getDifficultyAround(Entity entity) {
 		return getDifficultyAround(entity, PDConfig.getGroupRadius());
@@ -60,24 +44,22 @@ public class MobEvents {
 		if (!(event.getEntity() instanceof Mob mob)) return;
 		if (mob.level().isClientSide()) return;
 		if (!(mob.level() instanceof ServerLevel)) return;
-		if (mob.getPersistentData().getBoolean(WEIGHT_INIT_TAG)) return;
+		if (mob.getPersistentData().contains(DIFFICULTY_STORED)) return;
 
 		AttributeInstance weight = mob.getAttribute(attributeHolder(EpicFightAttributes.WEIGHT));
 		if (weight == null) return;
 
-		if (weight.getBaseValue() == 0.0D) {
-			double averageDifficulty = Math.max(0.0D, getDifficultyAround(mob));
-			applyDifficultyScaling(mob, averageDifficulty);
-		}
+		double averageDifficulty = getDifficultyAround(mob);
+		if (averageDifficulty < 0) return;
+		applyDifficultyScaling(mob, averageDifficulty);
 
-		mob.getPersistentData().putBoolean(WEIGHT_INIT_TAG, true);
 	}
 
 	@SubscribeEvent
 	public static void onXpDrop(LivingExperienceDropEvent event) {
 		if (!(event.getEntity() instanceof Mob mob)) return;
 		if (mob.level().isClientSide()) return;
-		if (event.getAttackingPlayer() instanceof ServerPlayer serverPlayer) {
+		if (event.getAttackingPlayer() instanceof ServerPlayer) {
 			double exp = event.getDroppedExperience();
 			int newEXP = (int) Math.round(exp * (1 + PDConfig.getExpBonus() * mob.getPersistentData().getDouble(DIFFICULTY_STORED)));
 			event.setDroppedExperience(Math.max(0, newEXP));
@@ -138,7 +120,7 @@ public class MobEvents {
 		}
 		double averageDifficulty = totalWeight > 0 ? totalDifficulty / totalWeight : 0;
 		averageDifficulty += averageDifficulty * (PDConfig.getGroupBonus() * Math.max(0, nearbyPlayers.size()-1));
-		
+
 		ResourceKey<Level> dimension = entity.level().dimension();
 		double dimensionBonus = PDConfig.getDimensionBonus(dimension.location());
 		double biomeBonus = 0.0d;

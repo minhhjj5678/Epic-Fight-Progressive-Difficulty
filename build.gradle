@@ -102,6 +102,7 @@ dependencies {
     // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
     implementation "net.neoforged:neoforge:${neo_version}"
     implementation "curse.maven:epic-fight-mod-405076:7878012"
+    implementation "curse.maven:c2me-533097:8646869"
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
